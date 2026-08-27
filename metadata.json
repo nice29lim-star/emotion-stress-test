@@ -1,0 +1,6 @@
+{
+  "name": "MindTracker - 마음 날씨 진단 및 멘탈 케어",
+  "description": "오늘의 감정 날씨, PSS 스트레스 부하, KRQ 회복탄력성을 측정하여 Gemini AI 기반 맞춤형 심리 진단 리포트와 3분 액션 플랜을 제공하는 웰니스 케어 서비스",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
