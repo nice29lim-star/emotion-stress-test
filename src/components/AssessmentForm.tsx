@@ -8,7 +8,7 @@ import {
   calculateScores,
 } from '../data/questions';
 import { AssessmentPayload } from '../types';
-import { ArrowLeft, ArrowRight, Check, Sparkles, AlertCircle, MessageSquareQuote } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Sparkles, AlertCircle, MessageSquareQuote, Heart, Sun, Activity, CloudRain } from 'lucide-react';
 
 interface AssessmentFormProps {
   onSubmit: (payload: AssessmentPayload) => void;
@@ -99,31 +99,32 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({ onSubmit, onCanc
     onSubmit(payload);
   };
 
-  // Progress percentage
   const stepProgress = currentStep === 1 ? 33 : currentStep === 2 ? 66 : 100;
 
   return (
-    <div className="w-full max-w-3xl mx-auto py-6 sm:py-10 px-4 sm:px-6">
-      {/* Top Progress & Step Header */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between text-xs sm:text-sm font-medium text-stone-600 mb-2.5">
-          <div className="flex items-center gap-2">
-            <span className="w-6 h-6 rounded-full bg-teal-700 text-white flex items-center justify-center text-xs font-bold">
+    <div className="w-full max-w-4xl mx-auto py-8 sm:py-12 px-4 sm:px-6">
+      {/* Top Progress & Step Header with Playful Badge */}
+      <div className="mb-8 p-5 sm:p-6 bg-white border-2 border-[#1E293B] rounded-3xl shadow-pop-card">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs sm:text-sm font-bold text-slate-700 mb-3">
+          <div className="flex items-center gap-2.5">
+            <span className="w-8 h-8 rounded-xl bg-[#8B5CF6] text-white border-2 border-[#1E293B] shadow-pop-sm flex items-center justify-center text-sm font-black font-mono">
               {currentStep}
             </span>
-            <span className="font-semibold text-stone-800">
+            <span className="font-heading font-extrabold text-base sm:text-lg text-[#1E293B]">
               {currentStep === 1 && 'Step 1 : 오늘의 마음 날씨 (실시간 감정)'}
               {currentStep === 2 && 'Step 2 : 마음의 무게 (스트레스 부하)'}
               {currentStep === 3 && 'Step 3 : 마음의 근육 (회복탄력성 자원)'}
             </span>
           </div>
-          <span className="text-stone-500">{stepProgress}% 완료</span>
+          <span className="px-3 py-1 rounded-full bg-[#FBBF24] border-2 border-[#1E293B] text-[11px] font-extrabold text-[#1E293B] self-start sm:self-auto">
+            {stepProgress}% 진행 완료
+          </span>
         </div>
 
-        {/* Progress Bar */}
-        <div className="w-full h-2 bg-stone-200/80 rounded-full overflow-hidden">
+        {/* Chunky Progress Bar */}
+        <div className="w-full h-3.5 bg-slate-100 border-2 border-[#1E293B] rounded-full overflow-hidden p-0.5">
           <div
-            className="h-full bg-teal-700 rounded-full transition-all duration-500 ease-out"
+            className="h-full bg-[#8B5CF6] rounded-full transition-all duration-500 ease-out"
             style={{ width: `${stepProgress}%` }}
           />
         </div>
@@ -131,8 +132,8 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({ onSubmit, onCanc
 
       {/* Validation Banner */}
       {validationError && (
-        <div className="mb-6 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm flex items-center gap-2 animate-shake">
-          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+        <div className="mb-6 p-4 rounded-2xl bg-[#F472B6]/20 border-2 border-[#1E293B] text-[#1E293B] font-bold text-xs sm:text-sm flex items-center gap-2.5 shadow-pop-sm animate-bounce">
+          <AlertCircle className="w-5 h-5 text-[#F472B6] fill-[#1E293B] shrink-0" />
           <span>{validationError}</span>
         </div>
       )}
@@ -140,20 +141,21 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({ onSubmit, onCanc
       {/* STEP 1: EMOTIONS */}
       {currentStep === 1 && (
         <div className="space-y-6">
-          <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 sm:p-8 border border-stone-200/70 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-            <div className="mb-6">
-              <span className="text-xs font-semibold text-teal-700 uppercase tracking-wider">
-                Q1. 실시간 감정 선택
-              </span>
-              <h2 className="text-xl sm:text-2xl font-bold text-stone-900 mt-1">
+          <div className="bg-white border-2 border-[#1E293B] rounded-3xl p-6 sm:p-8 shadow-pop-card">
+            <div className="mb-8">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FBBF24] border-2 border-[#1E293B] text-xs font-bold text-[#1E293B] mb-3 shadow-pop-sm">
+                <Sun className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span>Q1. 실시간 감정 선택 (마음 기후)</span>
+              </div>
+              <h2 className="font-heading text-2xl sm:text-3xl font-extrabold text-[#1E293B] tracking-tight">
                 지금 이 순간, 마음에 떠오르는 단어들을 골라주세요.
               </h2>
-              <p className="text-xs sm:text-sm text-stone-500 mt-1.5">
-                복수 선택이 가능합니다. 솔직한 현재 기분을 가볍게 터치해 보세요.
+              <p className="text-xs sm:text-sm text-slate-600 mt-2 font-medium">
+                복수 선택이 가능합니다. 솔직한 현재 기분을 가볍게 터치해 보세요. (선택 후 다음 단계로 이동)
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {EMOTIONS.map((emotion) => {
                 const isSelected = selectedEmotions.includes(emotion.label);
                 return (
@@ -161,32 +163,32 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({ onSubmit, onCanc
                     key={emotion.id}
                     type="button"
                     onClick={() => toggleEmotion(emotion.label)}
-                    className={`text-left p-4 rounded-2xl border transition-all flex items-start gap-3.5 relative cursor-pointer ${
+                    className={`text-left p-4.5 rounded-2xl border-2 transition-all flex items-start gap-3.5 relative cursor-pointer group ${
                       isSelected
-                        ? 'bg-teal-50/90 border-teal-600 text-teal-950 shadow-sm ring-1 ring-teal-600/30'
-                        : 'bg-white/60 border-stone-200/80 hover:border-stone-300 hover:bg-stone-50/80 text-stone-800'
+                        ? 'bg-[#8B5CF6] text-white border-[#1E293B] shadow-pop -translate-y-1'
+                        : 'bg-[#FFFDF5] border-[#1E293B] hover:bg-white text-[#1E293B] shadow-pop-sm hover:-translate-y-0.5'
                     }`}
                   >
-                    <span className="text-2xl sm:text-3xl p-1 shrink-0 select-none">
+                    <span className="text-3xl p-1 shrink-0 select-none group-hover:scale-110 transition-transform">
                       {emotion.emoji}
                     </span>
                     <div className="flex-1 pr-6">
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-base">{emotion.label}</span>
+                        <span className="font-heading font-bold text-base sm:text-lg">{emotion.label}</span>
                       </div>
-                      <p className="text-xs text-stone-500 mt-0.5 leading-relaxed">
+                      <p className={`text-xs mt-1 leading-relaxed ${isSelected ? 'text-violet-100' : 'text-slate-500 font-medium'}`}>
                         {emotion.description}
                       </p>
                     </div>
 
                     <div
-                      className={`w-5 h-5 rounded-full border flex items-center justify-center absolute top-4 right-4 transition-colors ${
+                      className={`w-6 h-6 rounded-full border-2 border-[#1E293B] flex items-center justify-center absolute top-4 right-4 transition-colors ${
                         isSelected
-                          ? 'bg-teal-700 border-teal-700 text-white'
-                          : 'border-stone-300 bg-white'
+                          ? 'bg-[#FBBF24] text-[#1E293B]'
+                          : 'bg-white text-transparent'
                       }`}
                     >
-                      {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
+                      {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
                     </div>
                   </button>
                 );
@@ -194,13 +196,13 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({ onSubmit, onCanc
             </div>
 
             {selectedEmotions.length > 0 && (
-              <div className="mt-6 pt-4 border-t border-stone-100 flex items-center gap-2 text-xs text-stone-600">
-                <span>선택된 감정:</span>
-                <div className="flex flex-wrap gap-1.5">
+              <div className="mt-8 pt-5 border-t-2 border-slate-100 flex items-center gap-3 text-xs text-slate-700 font-bold flex-wrap">
+                <span className="bg-slate-100 px-2.5 py-1 rounded-md border border-slate-300">선택된 감정 ({selectedEmotions.length}):</span>
+                <div className="flex flex-wrap gap-2">
                   {selectedEmotions.map((e) => (
                     <span
                       key={e}
-                      className="px-2.5 py-1 rounded-full bg-teal-100/70 text-teal-800 font-medium"
+                      className="px-3 py-1 rounded-full bg-[#8B5CF6] text-white border-2 border-[#1E293B] shadow-pop-sm font-bold"
                     >
                       {e}
                     </span>
@@ -215,44 +217,46 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({ onSubmit, onCanc
       {/* STEP 2: STRESS (PSS) */}
       {currentStep === 2 && (
         <div className="space-y-6">
-          <div className="bg-amber-50/70 border border-amber-200/70 rounded-2xl p-4 sm:p-5 flex items-start gap-3">
-            <span className="text-xl">⚖️</span>
-            <div className="text-xs sm:text-sm text-amber-900">
-              <strong className="font-semibold">스트레스 척도 (PSS 기반):</strong>
+          <div className="bg-[#F472B6]/20 border-2 border-[#1E293B] rounded-3xl p-5 shadow-pop-sm flex items-start gap-3.5">
+            <div className="w-9 h-9 rounded-xl bg-[#F472B6] border-2 border-[#1E293B] text-white flex items-center justify-center shrink-0 shadow-pop-sm">
+              <CloudRain className="w-5 h-5 stroke-[2.5]" />
+            </div>
+            <div className="text-xs sm:text-sm text-[#1E293B] font-medium leading-relaxed">
+              <strong className="font-heading font-extrabold text-[#1E293B]">스트레스 척도 (PSS Q2 ~ Q5):</strong>
               <span className="ml-1">
-                최근 한 달 동안 경험한 빈도를 기준으로 0점(전혀 없다)부터 4점(매우 자주 있다)까지 선택해 주세요.
+                Q1 감정 선택에 이은 스트레스 부하 측정 문항입니다. 최근 한 달 동안 경험한 빈도를 기준으로 0점(전혀 없다)부터 4점(매우 자주 있다)까지 선택해 주세요.
               </span>
             </div>
           </div>
 
-          {PSS_QUESTIONS.map((q) => {
+          {PSS_QUESTIONS.map((q, idx) => {
             const selectedVal = pssAnswers[q.id];
             return (
               <div
                 key={q.id}
-                className="bg-white/80 backdrop-blur-md rounded-2xl p-5 sm:p-6 border border-stone-200/70 shadow-[0_8px_30px_rgb(0,0,0,0.03)]"
+                className="bg-white border-2 border-[#1E293B] rounded-3xl p-6 sm:p-7 shadow-pop-card"
               >
-                <div className="mb-4">
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded-md bg-stone-100 text-stone-700 text-xs font-semibold">
-                      Q{q.number}
+                <div className="mb-5">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="px-3 py-1 rounded-full bg-[#FBBF24] text-[#1E293B] border-2 border-[#1E293B] text-xs font-bold shadow-pop-sm">
+                      Q{q.number} (스트레스 문항 {idx + 1}/4)
                     </span>
                     {q.isReversed && (
-                      <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200/60 text-[11px] font-medium">
-                        긍정적 대처 문항
+                      <span className="px-3 py-1 rounded-full bg-[#34D399] text-[#1E293B] border-2 border-[#1E293B] text-[11px] font-bold shadow-pop-sm">
+                        🌟 긍정적 대처 문항 (역채점)
                       </span>
                     )}
                   </div>
-                  <h3 className="text-base sm:text-lg font-semibold text-stone-900 mt-2 leading-snug">
+                  <h3 className="font-heading font-extrabold text-lg sm:text-xl text-[#1E293B] mt-3 leading-snug">
                     {q.text}
                   </h3>
                   {q.subtext && (
-                    <p className="text-xs text-stone-500 mt-1">{q.subtext}</p>
+                    <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1.5">{q.subtext}</p>
                   )}
                 </div>
 
-                {/* 5-point choice cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-5 gap-2 pt-1">
+                {/* 5-point choice buttons */}
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 pt-2">
                   {PSS_OPTIONS.map((opt) => {
                     const isSelected = selectedVal === opt.value;
                     return (
@@ -260,16 +264,16 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({ onSubmit, onCanc
                         key={opt.value}
                         type="button"
                         onClick={() => handleSetPSS(q.id, opt.value)}
-                        className={`p-3 rounded-xl border text-center transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
+                        className={`p-3.5 rounded-2xl border-2 text-center transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
                           isSelected
-                            ? 'bg-rose-50 border-rose-500 text-rose-950 ring-1 ring-rose-500/30 shadow-xs'
-                            : 'bg-white/60 border-stone-200 hover:border-stone-300 hover:bg-stone-50 text-stone-700'
+                            ? 'bg-[#F472B6] border-[#1E293B] text-white shadow-pop -translate-y-0.5 font-bold'
+                            : 'bg-[#FFFDF5] border-[#1E293B] hover:bg-[#F1F5F9] text-[#1E293B] shadow-pop-sm font-medium'
                         }`}
                       >
-                        <span className="text-xs sm:text-sm font-semibold whitespace-nowrap">
+                        <span className="text-xs sm:text-sm font-bold whitespace-nowrap">
                           {opt.label}
                         </span>
-                        <span className="text-[10px] text-stone-400 font-mono">
+                        <span className={`text-[11px] font-mono ${isSelected ? 'text-white' : 'text-slate-500'}`}>
                           {opt.scoreText}
                         </span>
                       </button>
@@ -285,42 +289,44 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({ onSubmit, onCanc
       {/* STEP 3: RESILIENCE (KRQ) & OPTIONAL NOTES */}
       {currentStep === 3 && (
         <div className="space-y-6">
-          <div className="bg-teal-50/70 border border-teal-200/70 rounded-2xl p-4 sm:p-5 flex items-start gap-3">
-            <span className="text-xl">🌱</span>
-            <div className="text-xs sm:text-sm text-teal-900">
-              <strong className="font-semibold">회복탄력성 척도 (KRQ 기반):</strong>
+          <div className="bg-[#34D399]/20 border-2 border-[#1E293B] rounded-3xl p-5 shadow-pop-sm flex items-start gap-3.5">
+            <div className="w-9 h-9 rounded-xl bg-[#34D399] border-2 border-[#1E293B] text-[#1E293B] flex items-center justify-center shrink-0 shadow-pop-sm">
+              <Activity className="w-5 h-5 stroke-[2.5]" />
+            </div>
+            <div className="text-xs sm:text-sm text-[#1E293B] font-medium leading-relaxed">
+              <strong className="font-heading font-extrabold text-[#1E293B]">회복탄력성 척도 (KRQ Q6 ~ Q9):</strong>
               <span className="ml-1">
-                내면의 회복 자원을 진단합니다. 1점(전혀 그렇지 않다)부터 5점(매우 그렇다)까지 선택해 주세요.
+                내면의 회복 자원을 진단합니다. 1점(전혀 그렇지 않다)부터 5점(매우 그렇다)까지 선택해 주세요. 완료 후 AI 마음 친구 '포미'와의 대화가 이어집니다.
               </span>
             </div>
           </div>
 
-          {KRQ_QUESTIONS.map((q) => {
+          {KRQ_QUESTIONS.map((q, idx) => {
             const selectedVal = krqAnswers[q.id];
             return (
               <div
                 key={q.id}
-                className="bg-white/80 backdrop-blur-md rounded-2xl p-5 sm:p-6 border border-stone-200/70 shadow-[0_8px_30px_rgb(0,0,0,0.03)]"
+                className="bg-white border-2 border-[#1E293B] rounded-3xl p-6 sm:p-7 shadow-pop-card"
               >
-                <div className="mb-4">
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded-md bg-stone-100 text-stone-700 text-xs font-semibold">
-                      Q{q.number}
+                <div className="mb-5">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="px-3 py-1 rounded-full bg-[#FBBF24] text-[#1E293B] border-2 border-[#1E293B] text-xs font-bold shadow-pop-sm">
+                      Q{q.number} (회복탄력성 문항 {idx + 1}/4)
                     </span>
-                    <span className="px-2 py-0.5 rounded-md bg-teal-50 text-teal-700 border border-teal-200/60 text-[11px] font-medium">
+                    <span className="px-3 py-1 rounded-full bg-[#34D399] text-[#1E293B] border-2 border-[#1E293B] text-[11px] font-bold shadow-pop-sm">
                       {q.dimensionLabel}
                     </span>
                   </div>
-                  <h3 className="text-base sm:text-lg font-semibold text-stone-900 mt-2 leading-snug">
+                  <h3 className="font-heading font-extrabold text-lg sm:text-xl text-[#1E293B] mt-3 leading-snug">
                     {q.text}
                   </h3>
-                  <p className="text-xs text-stone-500 mt-1">
+                  <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1.5">
                     {q.dimensionDescription}
                   </p>
                 </div>
 
-                {/* 5-point rating cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-5 gap-2 pt-1">
+                {/* 5-point rating buttons */}
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 pt-2">
                   {KRQ_OPTIONS.map((opt) => {
                     const isSelected = selectedVal === opt.value;
                     return (
@@ -328,16 +334,16 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({ onSubmit, onCanc
                         key={opt.value}
                         type="button"
                         onClick={() => handleSetKRQ(q.id, opt.value)}
-                        className={`p-3 rounded-xl border text-center transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
+                        className={`p-3.5 rounded-2xl border-2 text-center transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
                           isSelected
-                            ? 'bg-teal-50 border-teal-600 text-teal-950 ring-1 ring-teal-600/30 shadow-xs'
-                            : 'bg-white/60 border-stone-200 hover:border-stone-300 hover:bg-stone-50 text-stone-700'
+                            ? 'bg-[#34D399] border-[#1E293B] text-[#1E293B] shadow-pop -translate-y-0.5 font-bold'
+                            : 'bg-[#FFFDF5] border-[#1E293B] hover:bg-[#F1F5F9] text-[#1E293B] shadow-pop-sm font-medium'
                         }`}
                       >
-                        <span className="text-xs sm:text-sm font-semibold whitespace-nowrap">
+                        <span className="text-xs sm:text-sm font-bold whitespace-nowrap">
                           {opt.label}
                         </span>
-                        <span className="text-[10px] text-stone-400 font-mono">
+                        <span className="text-[11px] text-slate-600 font-mono">
                           {opt.scoreText}
                         </span>
                       </button>
@@ -349,47 +355,49 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({ onSubmit, onCanc
           })}
 
           {/* Optional User Reflection Notes */}
-          <div className="bg-white/80 backdrop-blur-md rounded-2xl p-5 sm:p-6 border border-stone-200/70 shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
-            <div className="flex items-center gap-2 mb-2">
-              <MessageSquareQuote className="w-4 h-4 text-stone-500" />
-              <h4 className="font-semibold text-stone-800 text-sm">
+          <div className="bg-white border-2 border-[#1E293B] rounded-3xl p-6 sm:p-7 shadow-pop-card">
+            <div className="flex items-center gap-2.5 mb-2">
+              <div className="w-8 h-8 rounded-xl bg-[#FBBF24] border-2 border-[#1E293B] flex items-center justify-center text-[#1E293B] shadow-pop-sm">
+                <MessageSquareQuote className="w-4 h-4 stroke-[2.5]" />
+              </div>
+              <h4 className="font-heading font-extrabold text-[#1E293B] text-base sm:text-lg">
                 오늘 내 마음에 남기고 싶은 한 줄 메모 (선택)
               </h4>
             </div>
-            <p className="text-xs text-stone-500 mb-3">
-              요즘 나를 가장 힘들게 하거나 위로가 필요한 일이 있다면 편안하게 적어주세요. AI가 리포트에 반영합니다.
+            <p className="text-xs sm:text-sm text-slate-500 font-medium mb-3">
+              요즘 나를 가장 힘들게 하거나 위로가 필요한 일이 있다면 편안하게 적어주세요. AI와의 대화 및 최종 리포트에 반영됩니다.
             </p>
             <textarea
               value={userNotes}
               onChange={(e) => setUserNotes(e.target.value)}
-              placeholder="예: 마감 일정이 겹쳐서 잠을 설쳤어요. 잠깐이라도 머리를 비우고 싶어요."
+              placeholder="예: 마감 일정이 겹쳐서 잠을 설쳤어요. 머리를 맑게 식히고 싶어요."
               rows={3}
               maxLength={300}
-              className="w-full p-3.5 rounded-xl border border-stone-200 focus:border-teal-600 focus:ring-2 focus:ring-teal-600/20 text-xs sm:text-sm text-stone-800 placeholder:text-stone-400 resize-none bg-stone-50/50"
+              className="w-full p-4 rounded-2xl border-2 border-slate-300 focus:border-[#8B5CF6] focus:shadow-pop-violet text-xs sm:text-sm text-[#1E293B] font-medium placeholder:text-slate-400 resize-none bg-[#FFFDF5] outline-none transition-all"
             />
-            <div className="text-right text-[11px] text-stone-400 mt-1">
+            <div className="text-right text-xs font-bold text-slate-400 mt-1 font-mono">
               {userNotes.length} / 300자
             </div>
           </div>
         </div>
       )}
 
-      {/* Navigation Buttons */}
-      <div className="mt-8 flex items-center justify-between gap-3">
+      {/* Navigation Buttons (Playful Candy Buttons) */}
+      <div className="mt-10 flex items-center justify-between gap-4">
         {currentStep > 1 ? (
           <button
             type="button"
             onClick={handlePrev}
-            className="px-5 py-3 rounded-xl border border-stone-200 hover:bg-stone-100 text-stone-700 text-xs sm:text-sm font-medium transition-colors flex items-center gap-1.5 cursor-pointer"
+            className="px-6 py-3.5 rounded-full border-2 border-[#1E293B] bg-white hover:bg-[#FBBF24] text-[#1E293B] text-xs sm:text-sm font-bold shadow-pop-sm hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center gap-2 cursor-pointer"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-4 h-4 stroke-[2.5]" />
             <span>이전 단계</span>
           </button>
         ) : (
           <button
             type="button"
             onClick={onCancel}
-            className="px-5 py-3 rounded-xl border border-stone-200 hover:bg-stone-100 text-stone-600 text-xs sm:text-sm font-medium transition-colors cursor-pointer"
+            className="px-6 py-3.5 rounded-full border-2 border-[#1E293B] bg-white hover:bg-slate-100 text-slate-700 text-xs sm:text-sm font-bold shadow-pop-sm hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all cursor-pointer"
           >
             처음으로
           </button>
@@ -399,22 +407,23 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({ onSubmit, onCanc
           <button
             type="button"
             onClick={handleNext}
-            className="px-7 py-3.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-xs sm:text-sm font-semibold shadow-md shadow-teal-700/20 transition-all flex items-center gap-2 ml-auto cursor-pointer"
+            className="px-8 py-4 rounded-full bg-[#8B5CF6] hover:bg-[#7C3AED] text-white font-heading font-extrabold text-xs sm:text-sm border-2 border-[#1E293B] shadow-pop hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-pop-lg active:translate-x-0.5 active:translate-y-0.5 active:shadow-pop-sm transition-all flex items-center gap-2.5 ml-auto cursor-pointer"
           >
             <span>다음 단계</span>
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="w-4 h-4 stroke-[3]" />
           </button>
         ) : (
           <button
             type="button"
             onClick={handleSubmit}
-            className="px-7 py-3.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-xs sm:text-sm font-semibold shadow-md shadow-teal-700/20 transition-all flex items-center gap-2 ml-auto cursor-pointer"
+            className="px-8 py-4 rounded-full bg-[#8B5CF6] hover:bg-[#7C3AED] text-white font-heading font-extrabold text-xs sm:text-sm border-2 border-[#1E293B] shadow-pop hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-pop-lg active:translate-x-0.5 active:translate-y-0.5 active:shadow-pop-sm transition-all flex items-center gap-2.5 ml-auto cursor-pointer"
           >
-            <Sparkles className="w-4 h-4" />
-            <span>마음 날씨 분석 리포트 생성</span>
+            <Sparkles className="w-4 h-4 stroke-[2.5]" />
+            <span>AI 마음 친구 '포미'와 대화하기</span>
           </button>
         )}
       </div>
     </div>
   );
 };
+

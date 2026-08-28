@@ -43,12 +43,20 @@ export interface AssessmentScores {
   };
 }
 
+export interface ChatMessage {
+  id: string;
+  role: 'assistant' | 'user';
+  content: string;
+  timestamp: string;
+}
+
 export interface AssessmentPayload {
   selectedEmotions: string[];
   pssAnswers: Record<string, number>;
   krqAnswers: Record<string, number>;
   scores: AssessmentScores;
   userNotes?: string;
+  chatHistory?: ChatMessage[];
   timestamp: string;
 }
 

@@ -1,91 +1,65 @@
 import React from 'react';
-import { CloudSun, History, Wind, ShieldAlert, HeartHandshake } from 'lucide-react';
+import { CloudSun, History, Wind, HeartHandshake, Sparkles } from 'lucide-react';
 
 interface HeaderProps {
-  currentTab: 'assessment' | 'history' | 'breathing';
-  onSelectTab: (tab: 'assessment' | 'history' | 'breathing') => void;
+  currentTab: 'assessment' | 'breathing';
+  onSelectTab: (tab: 'assessment' | 'breathing') => void;
   onOpenHotline: () => void;
-  savedLogsCount: number;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   currentTab,
   onSelectTab,
   onOpenHotline,
-  savedLogsCount,
 }) => {
   return (
-    <header className="sticky top-0 z-30 bg-stone-50/90 backdrop-blur-md border-b border-stone-200/60 transition-all duration-300">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 sm:h-18 flex items-center justify-between">
-        {/* Logo */}
+    <header className="sticky top-0 z-30 bg-[#FFFDF5]/95 backdrop-blur-md border-b-2 border-[#1E293B] transition-all duration-300">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-18 sm:h-20 flex items-center justify-between">
+        {/* Logo with Memphis Sticker feel */}
         <button
           id="btn-header-logo"
           onClick={() => onSelectTab('assessment')}
-          className="flex items-center gap-2.5 sm:gap-3 text-left group transition-transform active:scale-95"
+          className="flex items-center gap-3 text-left group transition-transform active:scale-95 cursor-pointer"
         >
-          <div className="w-10 h-10 rounded-2xl bg-teal-600/10 text-teal-700 flex items-center justify-center border border-teal-600/20 shadow-sm group-hover:bg-teal-600/15 transition-colors">
-            <CloudSun className="w-5 h-5 text-teal-700" />
+          <div className="w-11 h-11 rounded-2xl bg-[#8B5CF6] text-white flex items-center justify-center border-2 border-[#1E293B] shadow-pop-sm group-hover:-rotate-3 group-hover:scale-105 transition-all">
+            <CloudSun className="w-6 h-6 stroke-[2.5]" />
           </div>
           <div>
-            <div className="flex items-center gap-1.5">
-              <span className="font-semibold text-stone-900 tracking-tight text-base sm:text-lg">
+            <div className="flex items-center gap-2">
+              <span className="font-heading font-extrabold text-[#1E293B] tracking-tight text-lg sm:text-xl">
                 MindTracker
               </span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200/60 font-medium">
+              <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-[#FBBF24] text-[#1E293B] border-2 border-[#1E293B] font-bold shadow-[2px_2px_0px_#1E293B]">
                 Inner Weather
               </span>
             </div>
-            <p className="text-[11px] text-stone-500 hidden sm:block">
-              마음 날씨 진단 & 멘탈 케어
+            <p className="text-xs text-slate-500 font-medium hidden sm:block">
+              마음 날씨 진단 & AI 멘탈 케어
             </p>
           </div>
         </button>
 
-        {/* Navigation Tabs */}
-        <nav className="flex items-center gap-1 sm:gap-2">
+        {/* Navigation Tabs (Candy & Pill Buttons) */}
+        <nav className="flex items-center gap-2 sm:gap-3">
           <button
             id="btn-nav-assessment"
             onClick={() => onSelectTab('assessment')}
-            className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center gap-1.5 ${
+            className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-heading font-extrabold border-2 border-[#1E293B] transition-all flex items-center gap-1.5 cursor-pointer ${
               currentTab === 'assessment'
-                ? 'bg-stone-900 text-stone-50 shadow-sm'
-                : 'text-stone-600 hover:text-stone-900 hover:bg-stone-200/60'
+                ? 'bg-[#8B5CF6] text-white shadow-pop-sm'
+                : 'bg-white text-[#1E293B] hover:bg-[#F1F5F9] shadow-none hover:shadow-pop-sm'
             }`}
           >
-            <CloudSun className="w-4 h-4" />
+            <CloudSun className="w-4 h-4 stroke-[2.5]" />
             <span>마음 진단</span>
-          </button>
-
-          <button
-            id="btn-nav-history"
-            onClick={() => onSelectTab('history')}
-            className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center gap-1.5 relative ${
-              currentTab === 'history'
-                ? 'bg-stone-900 text-stone-50 shadow-sm'
-                : 'text-stone-600 hover:text-stone-900 hover:bg-stone-200/60'
-            }`}
-          >
-            <History className="w-4 h-4" />
-            <span>웰니스 기록장</span>
-            {savedLogsCount > 0 && (
-              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
-                currentTab === 'history' ? 'bg-teal-500 text-white' : 'bg-stone-200 text-stone-700'
-              }`}>
-                {savedLogsCount}
-              </span>
-            )}
           </button>
 
           <button
             id="btn-nav-breathing"
             onClick={() => onSelectTab('breathing')}
-            className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center gap-1.5 ${
-              currentTab === 'breathing'
-                ? 'bg-teal-700 text-white shadow-sm'
-                : 'text-teal-700 hover:bg-teal-50'
-            }`}
+            className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-heading font-extrabold border-2 border-[#1E293B] bg-white hover:bg-[#34D399] text-[#1E293B] hover:text-[#1E293B] shadow-pop-sm hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all flex items-center gap-1.5 cursor-pointer"
           >
-            <Wind className="w-4 h-4" />
+            <Wind className="w-4 h-4 stroke-[2.5]" />
             <span className="hidden sm:inline">3분 안심 호흡</span>
             <span className="sm:hidden">호흡</span>
           </button>
@@ -94,12 +68,13 @@ export const Header: React.FC<HeaderProps> = ({
             id="btn-open-hotline"
             onClick={onOpenHotline}
             title="마음 긴급 지원 센터 안내"
-            className="p-2 rounded-xl text-stone-400 hover:text-rose-600 hover:bg-rose-50 transition-colors ml-1"
+            className="w-10 h-10 rounded-full bg-white hover:bg-[#F472B6] hover:text-white text-[#1E293B] border-2 border-[#1E293B] flex items-center justify-center transition-all shadow-pop-sm hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 cursor-pointer ml-1"
           >
-            <HeartHandshake className="w-4 h-4" />
+            <HeartHandshake className="w-4 h-4 stroke-[2.5]" />
           </button>
         </nav>
       </div>
     </header>
   );
 };
+

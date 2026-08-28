@@ -73,100 +73,102 @@ export const HistoryDashboard: React.FC<HistoryDashboardProps> = ({
       : '0';
 
   return (
-    <div className="w-full max-w-4xl mx-auto py-6 sm:py-10 px-4 sm:px-6 space-y-6 sm:space-y-8">
+    <div className="w-full max-w-4xl mx-auto py-8 sm:py-12 px-4 sm:px-6 space-y-8">
       {/* Header & Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 flex items-center gap-2">
-            <CloudSun className="w-7 h-7 text-teal-700" />
-            <span>웰니스 기록장 & 마음 기후 트래킹</span>
+          <h1 className="font-heading text-2xl sm:text-3xl font-extrabold text-[#1E293B] flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-[#FBBF24] border-2 border-[#1E293B] text-[#1E293B] flex items-center justify-center shadow-pop-sm">
+              <CloudSun className="w-6 h-6 stroke-[2.5]" />
+            </div>
+            <span>웰니스 기록장 & 기후 트래킹</span>
           </h1>
-          <p className="text-xs sm:text-sm text-stone-600 mt-1">
+          <p className="text-xs sm:text-sm text-slate-600 font-medium mt-1.5 ml-1">
             시간의 흐름에 따른 마음 날씨의 변화와 회복탄력성 추이를 관찰하세요.
           </p>
         </div>
 
         <button
           onClick={onStartNewDiagnosis}
-          className="px-5 py-3 rounded-2xl bg-teal-700 hover:bg-teal-800 text-white text-xs sm:text-sm font-semibold shadow-md shadow-teal-700/20 transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+          className="px-6 py-3.5 rounded-full bg-[#8B5CF6] hover:bg-[#7C3AED] text-white font-heading font-extrabold text-xs sm:text-sm border-2 border-[#1E293B] shadow-pop hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer"
         >
-          <PlusCircle className="w-4 h-4" />
+          <PlusCircle className="w-4 h-4 stroke-[2.5]" />
           <span>오늘 마음 진단하기</span>
         </button>
       </div>
 
       {/* Summary KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl p-5 border border-stone-200/80 shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
-          <div className="text-xs font-semibold text-stone-500 uppercase tracking-wider">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <div className="bg-white border-2 border-[#1E293B] rounded-3xl p-6 shadow-pop-card">
+          <div className="text-xs font-heading font-extrabold text-slate-500 uppercase tracking-wider">
             총 진단 기록
           </div>
-          <div className="mt-2 flex items-baseline gap-1.5">
-            <span className="text-2xl sm:text-3xl font-extrabold text-stone-900 font-mono">
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-3xl sm:text-4xl font-black text-[#1E293B] font-mono">
               {totalCount}
             </span>
-            <span className="text-xs text-stone-500 font-medium">회 완료</span>
+            <span className="text-xs text-slate-500 font-bold">회 완료</span>
           </div>
         </div>
 
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl p-5 border border-stone-200/80 shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
-          <div className="text-xs font-semibold text-rose-700 uppercase tracking-wider">
+        <div className="bg-white border-2 border-[#1E293B] rounded-3xl p-6 shadow-pop-card">
+          <div className="text-xs font-heading font-extrabold text-[#F472B6] uppercase tracking-wider">
             평균 스트레스 부하 (PSS)
           </div>
-          <div className="mt-2 flex items-baseline gap-1.5">
-            <span className="text-2xl sm:text-3xl font-extrabold text-rose-900 font-mono">
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-3xl sm:text-4xl font-black text-[#F472B6] font-mono">
               {avgStress}
             </span>
-            <span className="text-xs text-stone-500 font-medium">/ 16점</span>
+            <span className="text-xs text-slate-500 font-bold">/ 16점</span>
           </div>
         </div>
 
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl p-5 border border-stone-200/80 shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
-          <div className="text-xs font-semibold text-teal-700 uppercase tracking-wider">
+        <div className="bg-white border-2 border-[#1E293B] rounded-3xl p-6 shadow-pop-card">
+          <div className="text-xs font-heading font-extrabold text-[#8B5CF6] uppercase tracking-wider">
             평균 회복탄력성 (KRQ)
           </div>
-          <div className="mt-2 flex items-baseline gap-1.5">
-            <span className="text-2xl sm:text-3xl font-extrabold text-teal-900 font-mono">
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-3xl sm:text-4xl font-black text-[#8B5CF6] font-mono">
               {avgResilience}
             </span>
-            <span className="text-xs text-stone-500 font-medium">/ 5.0점</span>
+            <span className="text-xs text-slate-500 font-bold">/ 5.0점</span>
           </div>
         </div>
       </div>
 
       {/* Wellness Trend Chart */}
       {logs.length > 1 && (
-        <div className="bg-white/85 backdrop-blur-md rounded-3xl p-6 border border-stone-200/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-          <div className="flex items-center justify-between mb-4">
+        <div className="bg-white border-2 border-[#1E293B] rounded-3xl p-6 sm:p-8 shadow-pop-card">
+          <div className="flex items-center justify-between mb-5">
             <div>
-              <h2 className="text-base sm:text-lg font-bold text-stone-900 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-teal-700" />
+              <h2 className="font-heading font-extrabold text-lg sm:text-xl text-[#1E293B] flex items-center gap-2.5">
+                <TrendingUp className="w-5 h-5 text-[#8B5CF6] stroke-[2.5]" />
                 <span>스트레스 및 회복력 변화 추이</span>
               </h2>
-              <p className="text-xs text-stone-500 mt-0.5">
+              <p className="text-xs text-slate-500 font-medium mt-1">
                 지속적인 로깅을 통해 내면의 회복 주기를 파악할 수 있습니다.
               </p>
             </div>
           </div>
 
-          <div className="h-60 sm:h-72 w-full pt-2">
+          <div className="h-64 sm:h-72 w-full pt-2">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748b' }} />
-                <YAxis domain={[0, 16]} tick={{ fontSize: 11, fill: '#64748b' }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#1e293b', fontWeight: 600 }} />
+                <YAxis domain={[0, 16]} tick={{ fontSize: 11, fill: '#1e293b', fontWeight: 600 }} />
                 <Tooltip
                   content={({ active, payload }) => {
                     if (active && payload && payload.length) {
                       const data = payload[0].payload;
                       return (
-                        <div className="p-3 bg-white/95 rounded-xl border border-stone-200 shadow-md text-xs space-y-1">
-                          <p className="font-bold text-stone-800">{data.fullDate}</p>
-                          <p className="text-stone-600">{data.title}</p>
-                          <div className="pt-1 text-rose-600 font-semibold">
+                        <div className="p-3.5 bg-white rounded-2xl border-2 border-[#1E293B] shadow-pop-sm text-xs space-y-1">
+                          <p className="font-heading font-extrabold text-[#1E293B]">{data.fullDate}</p>
+                          <p className="text-slate-600 font-medium">{data.title}</p>
+                          <div className="pt-1 text-[#F472B6] font-extrabold font-mono">
                             스트레스: {data.stress}점
                           </div>
-                          <div className="text-teal-700 font-semibold">
+                          <div className="text-[#8B5CF6] font-extrabold font-mono">
                             회복탄력성: {data.resilienceRaw}점 (5점 만점)
                           </div>
                         </div>
@@ -175,24 +177,24 @@ export const HistoryDashboard: React.FC<HistoryDashboardProps> = ({
                     return null;
                   }}
                 />
-                <Legend verticalAlign="top" height={36} wrapperStyle={{ fontSize: '12px' }} />
+                <Legend verticalAlign="top" height={36} wrapperStyle={{ fontSize: '12px', fontWeight: 700 }} />
                 <Line
                   type="monotone"
                   dataKey="stress"
                   name="스트레스 (PSS, 16점 만점)"
-                  stroke="#e11d48"
-                  strokeWidth={2.5}
-                  dot={{ r: 4, fill: '#e11d48' }}
-                  activeDot={{ r: 6 }}
+                  stroke="#F472B6"
+                  strokeWidth={3}
+                  dot={{ r: 5, fill: '#F472B6', stroke: '#1E293B', strokeWidth: 2 }}
+                  activeDot={{ r: 7 }}
                 />
                 <Line
                   type="monotone"
                   dataKey="resilience"
-                  name="회복탄력성 지표 (스케일 환산)"
-                  stroke="#0d9488"
-                  strokeWidth={2.5}
-                  dot={{ r: 4, fill: '#0d9488' }}
-                  activeDot={{ r: 6 }}
+                  name="회복탄력성 지표 (환산치)"
+                  stroke="#8B5CF6"
+                  strokeWidth={3}
+                  dot={{ r: 5, fill: '#8B5CF6', stroke: '#1E293B', strokeWidth: 2 }}
+                  activeDot={{ r: 7 }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -201,17 +203,17 @@ export const HistoryDashboard: React.FC<HistoryDashboardProps> = ({
       )}
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
         {/* Risk Filter Tabs */}
-        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-stone-200/60 w-full sm:w-auto">
+        <div className="flex items-center gap-2 p-1.5 rounded-full bg-slate-200/80 border-2 border-[#1E293B] w-full sm:w-auto">
           {(['all', '안전', '주의', '위험'] as const).map((r) => (
             <button
               key={r}
               onClick={() => setFilterRisk(r)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex-1 sm:flex-none cursor-pointer ${
+              className={`px-4 py-1.5 rounded-full text-xs font-heading font-extrabold transition-all flex-1 sm:flex-none cursor-pointer ${
                 filterRisk === r
-                  ? 'bg-white text-stone-900 shadow-xs'
-                  : 'text-stone-600 hover:text-stone-900'
+                  ? 'bg-[#1E293B] text-white shadow-sm'
+                  : 'text-[#1E293B] hover:bg-slate-300/60'
               }`}
             >
               {r === 'all' ? '전체 보기' : r}
@@ -220,93 +222,93 @@ export const HistoryDashboard: React.FC<HistoryDashboardProps> = ({
         </div>
 
         {/* Search input */}
-        <div className="relative w-full sm:w-64">
-          <Search className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
+        <div className="relative w-full sm:w-72">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="제목, 메모 검색..."
-            className="w-full pl-9 pr-3 py-1.5 rounded-xl border border-stone-200 bg-white text-xs text-stone-800 placeholder:text-stone-400 focus:border-teal-600 focus:outline-none"
+            className="w-full pl-10 pr-4 py-2 rounded-full border-2 border-slate-300 focus:border-[#8B5CF6] focus:shadow-pop-violet bg-[#FFFDF5] text-xs text-[#1E293B] font-medium outline-none transition-all"
           />
         </div>
       </div>
 
       {/* Logs List */}
       {filteredLogs.length === 0 ? (
-        <div className="bg-white/80 backdrop-blur-md rounded-3xl p-10 text-center border border-stone-200/80 space-y-3">
-          <p className="text-stone-500 text-sm">일치하는 진단 기록이 없습니다.</p>
+        <div className="bg-white border-2 border-[#1E293B] rounded-3xl p-12 text-center shadow-pop-card space-y-4">
+          <p className="text-slate-500 font-medium text-sm">일치하는 진단 기록이 없습니다.</p>
           <button
             onClick={onStartNewDiagnosis}
-            className="px-5 py-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold shadow-sm transition-colors cursor-pointer"
+            className="px-6 py-3 rounded-full bg-[#8B5CF6] hover:bg-[#7C3AED] text-white font-heading font-extrabold text-xs border-2 border-[#1E293B] shadow-pop-sm hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all cursor-pointer"
           >
             새로운 마음 진단 진행하기
           </button>
         </div>
       ) : (
-        <div className="space-y-3.5">
+        <div className="space-y-4">
           {filteredLogs.map((log) => {
             const riskBadgeColor =
               log.riskLevel === '안전'
-                ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                ? 'bg-[#34D399] text-[#1E293B]'
                 : log.riskLevel === '주의'
-                ? 'bg-amber-50 text-amber-900 border-amber-200'
-                : 'bg-rose-50 text-rose-900 border-rose-300';
+                ? 'bg-[#FBBF24] text-[#1E293B]'
+                : 'bg-[#F472B6] text-white';
 
             return (
               <div
                 key={log.id}
-                className="bg-white/85 backdrop-blur-md rounded-2xl p-5 border border-stone-200/80 shadow-[0_8px_30px_rgb(0,0,0,0.03)] hover:border-stone-300 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 group"
+                className="bg-white border-2 border-[#1E293B] rounded-3xl p-6 shadow-pop hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 group"
               >
                 <div
                   onClick={() => onSelectLog(log.report)}
                   className="flex-1 cursor-pointer"
                 >
-                  <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                    <span className="text-xs text-stone-500 flex items-center gap-1 font-medium">
-                      <Calendar className="w-3.5 h-3.5" />
+                  <div className="flex items-center gap-2.5 mb-2 flex-wrap">
+                    <span className="text-xs text-slate-600 flex items-center gap-1 font-bold">
+                      <Calendar className="w-3.5 h-3.5 stroke-[2.5]" />
                       {log.date}
                     </span>
-                    <span className={`text-[11px] px-2.5 py-0.5 rounded-full border font-semibold ${riskBadgeColor}`}>
+                    <span className={`text-[11px] px-3 py-0.5 rounded-full border-2 border-[#1E293B] font-heading font-extrabold shadow-pop-sm ${riskBadgeColor}`}>
                       {log.riskLevel}
                     </span>
-                    <span className="text-xs px-2 py-0.5 rounded-md bg-stone-100 text-stone-700 font-medium">
+                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#FFFDF5] text-[#1E293B] font-bold border border-slate-300">
                       {log.primaryEmotion}
                     </span>
                   </div>
 
-                  <h3 className="font-bold text-stone-900 text-base sm:text-lg group-hover:text-teal-800 transition-colors">
+                  <h3 className="font-heading font-extrabold text-[#1E293B] text-lg group-hover:text-[#8B5CF6] transition-colors">
                     {log.summaryWeather}
                   </h3>
 
                   {log.userNotes && (
-                    <p className="text-xs text-stone-600 mt-1 line-clamp-1 bg-stone-50/80 px-2.5 py-1 rounded-md border border-stone-200/50">
+                    <p className="text-xs text-slate-700 font-medium mt-1.5 line-clamp-1 bg-[#FFFDF5] px-3 py-1.5 rounded-xl border border-slate-200">
                       📝 {log.userNotes}
                     </p>
                   )}
 
-                  <div className="mt-2.5 flex items-center gap-4 text-xs text-stone-500 font-mono">
+                  <div className="mt-3 flex items-center gap-5 text-xs text-slate-600 font-mono font-bold">
                     <span>
-                      스트레스: <strong className="text-rose-700 font-bold">{log.stressScore}점</strong>
+                      스트레스: <strong className="text-[#F472B6]">{log.stressScore}점</strong>
                     </span>
                     <span>
-                      회복탄력성: <strong className="text-teal-700 font-bold">{log.resilienceScore}점</strong>
+                      회복탄력성: <strong className="text-[#8B5CF6]">{log.resilienceScore}점</strong>
                     </span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 border-t sm:border-t-0 pt-3 sm:pt-0 justify-end">
+                <div className="flex items-center gap-2.5 border-t-2 sm:border-t-0 border-slate-100 pt-3 sm:pt-0 justify-end">
                   <button
                     onClick={() => onSelectLog(log.report)}
-                    className="px-4 py-2 rounded-xl bg-teal-50 hover:bg-teal-100/80 text-teal-800 text-xs font-semibold transition-colors flex items-center gap-1 cursor-pointer"
+                    className="px-5 py-2.5 rounded-full bg-violet-50 hover:bg-[#8B5CF6] text-[#8B5CF6] hover:text-white border-2 border-[#1E293B] font-heading font-extrabold text-xs shadow-pop-sm hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all flex items-center gap-1.5 cursor-pointer"
                   >
                     <span>리포트 열람</span>
-                    <ChevronRight className="w-4 h-4" />
+                    <ChevronRight className="w-4 h-4 stroke-[2.5]" />
                   </button>
 
                   <button
                     onClick={() => onDeleteLog(log.id)}
-                    className="p-2 rounded-xl text-stone-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                    className="p-2.5 rounded-full border-2 border-slate-200 text-slate-400 hover:text-rose-600 hover:bg-rose-50 hover:border-rose-400 transition-colors cursor-pointer"
                     title="기록 삭제"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -320,3 +322,4 @@ export const HistoryDashboard: React.FC<HistoryDashboardProps> = ({
     </div>
   );
 };
+

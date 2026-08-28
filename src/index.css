@@ -1,1 +1,98 @@
 @import "tailwindcss";
+
+@layer utilities {
+  .font-heading {
+    font-family: 'Outfit', 'Noto Sans KR', system-ui, sans-serif;
+  }
+
+  .font-body {
+    font-family: 'Plus Jakarta Sans', 'Noto Sans KR', system-ui, sans-serif;
+  }
+
+  /* Pop Shadows (Hard Shadow, No Blur) */
+  .shadow-pop {
+    box-shadow: 4px 4px 0px 0px #1E293B;
+  }
+
+  .shadow-pop-sm {
+    box-shadow: 2px 2px 0px 0px #1E293B;
+  }
+
+  .shadow-pop-md {
+    box-shadow: 4px 4px 0px 0px #1E293B;
+  }
+
+  .shadow-pop-lg {
+    box-shadow: 6px 6px 0px 0px #1E293B;
+  }
+
+  .shadow-pop-xl {
+    box-shadow: 8px 8px 0px 0px #1E293B;
+  }
+
+  /* Colored Hard Shadows */
+  .shadow-pop-violet {
+    box-shadow: 4px 4px 0px 0px #8B5CF6;
+  }
+
+  .shadow-pop-pink {
+    box-shadow: 4px 4px 0px 0px #F472B6;
+  }
+
+  .shadow-pop-yellow {
+    box-shadow: 4px 4px 0px 0px #FBBF24;
+  }
+
+  .shadow-pop-mint {
+    box-shadow: 4px 4px 0px 0px #34D399;
+  }
+
+  .shadow-pop-card {
+    box-shadow: 5px 5px 0px 0px #1E293B;
+  }
+
+  /* Tactile Interactive States */
+  .btn-pop {
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .btn-pop:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px 0px #1E293B;
+  }
+  .btn-pop:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px 0px #1E293B;
+  }
+
+  /* Dot Grid Pattern */
+  .bg-dot-grid {
+    background-image: radial-gradient(#CBD5E1 1.5px, transparent 1.5px);
+    background-size: 24px 24px;
+  }
+
+  .bg-dot-grid-dense {
+    background-image: radial-gradient(#94A3B8 1.5px, transparent 1.5px);
+    background-size: 16px 16px;
+  }
+
+  /* Diagonal Stripe Pattern */
+  .bg-stripes {
+    background-image: repeating-linear-gradient(
+      45deg,
+      #F1F5F9,
+      #F1F5F9 10px,
+      #FFFFFF 10px,
+      #FFFFFF 20px
+    );
+  }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(3deg); }
+  75% { transform: rotate(-3deg); }
+}
+
+.animate-wiggle {
+  animation: wiggle 0.6s ease-in-out infinite;
+}

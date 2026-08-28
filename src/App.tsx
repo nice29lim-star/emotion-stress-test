@@ -1,39 +1,39 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Header } from './components/Header';
 import { LandingHero } from './components/LandingHero';
 import { AssessmentForm } from './components/AssessmentForm';
+import { AICoachChat } from './components/AICoachChat';
 import { LoadingAnalysis } from './components/LoadingAnalysis';
 import { ReportDashboard } from './components/ReportDashboard';
-import { HistoryDashboard } from './components/HistoryDashboard';
 import { BreathingModal } from './components/BreathingModal';
 import { SafetyHotlineModal } from './components/SafetyHotlineModal';
-import { AssessmentPayload, DiagnosisReport, WellnessLog } from './types';
-import { getSavedLogs, saveDiagnosisLog, deleteLog, seedDemoLogsIfEmpty } from './utils/storage';
+import { AssessmentPayload, DiagnosisReport } from './types';
 import confetti from 'canvas-confetti';
-import { CloudSun, Heart } from 'lucide-react';
+import { CloudSun } from 'lucide-react';
 
 export default function App() {
   // Navigation & view states
-  const [currentTab, setCurrentTab] = useState<'assessment' | 'history' | 'breathing'>('assessment');
-  const [assessmentStage, setAssessmentStage] = useState<'landing' | 'form' | 'loading' | 'result'>('landing');
+  const [currentTab, setCurrentTab] = useState<'assessment' | 'breathing'>('assessment');
+  const [assessmentStage, setAssessmentStage] = useState<'landing' | 'form' | 'chat' | 'loading' | 'result'>('landing');
+
+  // Stored pending payload before or during chat
+  const [pendingPayload, setPendingPayload] = useState<AssessmentPayload | null>(null);
 
   // Active Report
   const [activeReport, setActiveReport] = useState<DiagnosisReport | null>(null);
-
-  // Saved Logs
-  const [savedLogs, setSavedLogs] = useState<WellnessLog[]>([]);
 
   // Modals
   const [showBreathingModal, setShowBreathingModal] = useState<boolean>(false);
   const [showHotlineModal, setShowHotlineModal] = useState<boolean>(false);
 
-  // Load saved history on mount
-  useEffect(() => {
-    const logs = seedDemoLogsIfEmpty();
-    setSavedLogs(logs);
-  }, []);
+  // Transition from Form to AI Coach Chat
+  const handleProceedToChat = (payload: AssessmentPayload) => {
+    setPendingPayload(payload);
+    setAssessmentStage('chat');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
-  // Handle Assessment Submission
+  // Handle Assessment Submission & Final Report Generation
   const handleSubmitAssessment = async (payload: AssessmentPayload) => {
     setAssessmentStage('loading');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -62,9 +62,6 @@ export default function App() {
         assessmentData: payload,
       };
 
-      // Auto save to history
-      const saved = saveDiagnosisLog(newReport, payload.userNotes);
-      setSavedLogs(getSavedLogs());
       setActiveReport(newReport);
       setAssessmentStage('result');
 
@@ -73,7 +70,7 @@ export default function App() {
         particleCount: 50,
         spread: 80,
         origin: { y: 0.6 },
-        colors: ['#0d9488', '#f43f5e', '#fbbf24'],
+        colors: ['#8B5CF6', '#F472B6', '#FBBF24', '#34D399'],
       });
     } catch (error) {
       console.error('Failed to analyze assessment with API:', error);
@@ -100,8 +97,6 @@ export default function App() {
         assessmentData: payload,
       };
 
-      saveDiagnosisLog(fallbackReport, payload.userNotes);
-      setSavedLogs(getSavedLogs());
       setActiveReport(fallbackReport);
       setAssessmentStage('result');
     }
@@ -109,32 +104,14 @@ export default function App() {
 
   const handleRetake = () => {
     setActiveReport(null);
+    setPendingPayload(null);
     setAssessmentStage('form');
     setCurrentTab('assessment');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleSelectPastLog = (report: DiagnosisReport) => {
-    setActiveReport(report);
-    setAssessmentStage('result');
-    setCurrentTab('assessment');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleDeleteLog = (id: string) => {
-    const updated = deleteLog(id);
-    setSavedLogs(updated);
-  };
-
-  const handleSaveNoteToHistory = (note?: string) => {
-    if (activeReport) {
-      saveDiagnosisLog(activeReport, note);
-      setSavedLogs(getSavedLogs());
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-stone-50 text-stone-800 flex flex-col selection:bg-teal-100 selection:text-teal-900">
+    <div className="min-h-screen bg-[#FFFDF5] text-[#1E293B] flex flex-col selection:bg-[#FBBF24] selection:text-[#1E293B]">
       {/* Top Sticky Header */}
       <Header
         currentTab={currentTab}
@@ -149,7 +126,6 @@ export default function App() {
           }
         }}
         onOpenHotline={() => setShowHotlineModal(true)}
-        savedLogsCount={savedLogs.length}
       />
 
       {/* Main Content Body */}
@@ -159,15 +135,21 @@ export default function App() {
             {assessmentStage === 'landing' && (
               <LandingHero
                 onStart={() => setAssessmentStage('form')}
-                onViewHistory={() => setCurrentTab('history')}
-                recentLog={savedLogs[0]}
               />
             )}
 
             {assessmentStage === 'form' && (
               <AssessmentForm
-                onSubmit={handleSubmitAssessment}
+                onSubmit={handleProceedToChat}
                 onCancel={() => setAssessmentStage('landing')}
+              />
+            )}
+
+            {assessmentStage === 'chat' && pendingPayload && (
+              <AICoachChat
+                assessmentData={pendingPayload}
+                onCompleteChat={handleSubmitAssessment}
+                onCancelToForm={() => setAssessmentStage('form')}
               />
             )}
 
@@ -179,22 +161,9 @@ export default function App() {
                 onRetake={handleRetake}
                 onOpenBreathing={() => setShowBreathingModal(true)}
                 onOpenHotline={() => setShowHotlineModal(true)}
-                onSaveToHistory={handleSaveNoteToHistory}
               />
             )}
           </>
-        )}
-
-        {currentTab === 'history' && (
-          <HistoryDashboard
-            logs={savedLogs}
-            onSelectLog={handleSelectPastLog}
-            onDeleteLog={handleDeleteLog}
-            onStartNewDiagnosis={() => {
-              setCurrentTab('assessment');
-              setAssessmentStage('form');
-            }}
-          />
         )}
       </main>
 
@@ -207,21 +176,24 @@ export default function App() {
         <SafetyHotlineModal onClose={() => setShowHotlineModal(false)} />
       )}
 
-      {/* Subtle Warm Footer */}
-      <footer className="mt-auto py-8 px-4 sm:px-6 border-t border-stone-200/60 bg-stone-100/40 text-center text-xs text-stone-500">
-        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <CloudSun className="w-4 h-4 text-teal-700" />
-            <span className="font-semibold text-stone-700">MindTracker - Inner Weather</span>
-            <span>• 마음 날씨 진단 및 멘탈 케어</span>
+      {/* Playful Geometric Footer */}
+      <footer className="mt-auto py-8 px-4 sm:px-6 border-t-2 border-[#1E293B] bg-white text-center text-xs text-slate-600">
+        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2.5">
+            <div className="w-6 h-6 rounded-lg bg-[#FBBF24] border-2 border-[#1E293B] flex items-center justify-center text-[#1E293B]">
+              <CloudSun className="w-3.5 h-3.5 stroke-[2.5]" />
+            </div>
+            <span className="font-heading font-extrabold text-[#1E293B]">MindTracker - Inner Weather</span>
+            <span className="font-bold text-slate-400">•</span>
+            <span className="font-bold">마음 날씨 진단 및 멘탈 케어</span>
           </div>
 
-          <div className="flex items-center gap-4 text-stone-400">
-            <span>Google AI Studio Gemini 3.7 Flash</span>
-            <span>•</span>
+          <div className="flex items-center gap-4 text-slate-500 font-bold">
+            <span>Powered by Gemini 3.7 Flash</span>
+            <span className="text-slate-300">•</span>
             <button
               onClick={() => setShowHotlineModal(true)}
-              className="hover:text-rose-600 transition-colors underline underline-offset-2"
+              className="text-[#F472B6] hover:underline font-extrabold cursor-pointer"
             >
               24시 위기상담 안내
             </button>

@@ -16,6 +16,9 @@ import {
   Heart,
   FileText,
   Calendar,
+  Sun,
+  Flame,
+  BookmarkPlus,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -24,7 +27,6 @@ interface ReportDashboardProps {
   onRetake: () => void;
   onOpenBreathing: () => void;
   onOpenHotline: () => void;
-  onSaveToHistory?: (note?: string) => void;
 }
 
 export const ReportDashboard: React.FC<ReportDashboardProps> = ({
@@ -32,7 +34,6 @@ export const ReportDashboard: React.FC<ReportDashboardProps> = ({
   onRetake,
   onOpenBreathing,
   onOpenHotline,
-  onSaveToHistory,
 }) => {
   const [copied, setCopied] = useState(false);
   const [userNote, setUserNote] = useState(report.assessmentData.userNotes || '');
@@ -45,24 +46,24 @@ export const ReportDashboard: React.FC<ReportDashboardProps> = ({
     switch (level) {
       case '안전':
         return {
-          bg: 'bg-emerald-50 text-emerald-800 border-emerald-200',
-          dot: 'bg-emerald-500',
+          bg: 'bg-[#34D399] text-[#1E293B] border-2 border-[#1E293B] shadow-pop-sm',
+          dot: 'bg-[#1E293B]',
           icon: ShieldCheck,
           label: '마음 날씨 : 맑음 (안전)',
           desc: '심리적 균형이 건강하게 유지되고 있습니다.',
         };
       case '주의':
         return {
-          bg: 'bg-amber-50 text-amber-900 border-amber-200',
-          dot: 'bg-amber-500',
+          bg: 'bg-[#FBBF24] text-[#1E293B] border-2 border-[#1E293B] shadow-pop-sm',
+          dot: 'bg-[#1E293B]',
           icon: AlertTriangle,
           label: '마음 날씨 : 흐림 (주의)',
           desc: '스트레스가 누적되어 에너지 충전이 필요합니다.',
         };
       case '위험':
         return {
-          bg: 'bg-rose-50 text-rose-900 border-rose-300',
-          dot: 'bg-rose-500',
+          bg: 'bg-[#F472B6] text-white border-2 border-[#1E293B] shadow-pop-sm',
+          dot: 'bg-white',
           icon: ShieldAlert,
           label: '마음 날씨 : 폭풍우 (위험/고갈)',
           desc: '즉각적인 쉼과 적극적인 심리 케어가 시급합니다.',
@@ -93,30 +94,24 @@ ${report.actionPlans.find((p) => p.type === 'routine')?.title} - ${report.action
   };
 
   const handleSaveNote = () => {
-    if (onSaveToHistory) {
-      onSaveToHistory(userNote);
-    }
     setNoteSaved(true);
     confetti({
-      particleCount: 40,
-      spread: 60,
+      particleCount: 50,
+      spread: 70,
       origin: { y: 0.8 },
-      colors: ['#0d9488', '#f43f5e', '#f59e0b'],
+      colors: ['#8B5CF6', '#F472B6', '#FBBF24', '#34D399'],
     });
     setTimeout(() => setNoteSaved(false), 3000);
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto py-6 sm:py-10 px-4 sm:px-6 space-y-6 sm:space-y-8">
+    <div className="w-full max-w-4xl mx-auto py-8 sm:py-12 px-4 sm:px-6 space-y-7">
       {/* 1. Header Banner & Title */}
-      <div className="bg-white/85 backdrop-blur-md rounded-3xl p-6 sm:p-8 border border-stone-200/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden">
-        {/* Subtle decorative background glow */}
-        <div className="absolute top-0 right-0 w-72 h-72 bg-teal-100/40 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
-
+      <div className="bg-white border-2 border-[#1E293B] rounded-3xl p-6 sm:p-9 shadow-pop-card relative overflow-hidden">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-2">
-            <span className="text-xs px-3 py-1 rounded-full bg-stone-100 text-stone-700 font-medium flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5" />
+            <span className="text-xs px-3.5 py-1.5 rounded-full bg-slate-100 border-2 border-[#1E293B] text-[#1E293B] font-bold flex items-center gap-1.5 shadow-pop-sm">
+              <Calendar className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>
                 {new Date(report.createdAt).toLocaleDateString('ko-KR', {
                   year: 'numeric',
@@ -125,8 +120,7 @@ ${report.actionPlans.find((p) => p.type === 'routine')?.title} - ${report.action
                 })}
               </span>
             </span>
-            <span className="text-xs text-stone-400">|</span>
-            <span className="text-xs text-teal-700 font-semibold flex items-center gap-1">
+            <span className="text-xs px-3.5 py-1.5 rounded-full bg-[#8B5CF6] text-white border-2 border-[#1E293B] font-bold flex items-center gap-1 shadow-pop-sm">
               <Sparkles className="w-3.5 h-3.5" />
               <span>AI 종합 심리 리포트</span>
             </span>
@@ -134,39 +128,41 @@ ${report.actionPlans.find((p) => p.type === 'routine')?.title} - ${report.action
 
           {/* Risk Level Badge */}
           <div
-            className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-xs font-semibold ${riskInfo.bg}`}
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-full font-heading font-extrabold text-xs ${riskInfo.bg}`}
           >
-            <span className={`w-2 h-2 rounded-full ${riskInfo.dot} animate-pulse`} />
-            <RiskIcon className="w-4 h-4" />
+            <span className={`w-2.5 h-2.5 rounded-full ${riskInfo.dot} animate-pulse`} />
+            <RiskIcon className="w-4 h-4 stroke-[2.5]" />
             <span>{riskInfo.label}</span>
           </div>
         </div>
 
         {/* Report Main Title */}
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-stone-900 tracking-tight leading-snug">
+        <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#1E293B] tracking-tight leading-snug mt-2">
           {report.reportTitle}
         </h1>
 
         {/* Comforting Summary Sentence Card */}
-        <div className="mt-4 p-4 sm:p-5 rounded-2xl bg-teal-50/80 border border-teal-200/70 text-teal-950 flex items-start gap-3.5">
-          <Heart className="w-5 h-5 text-teal-700 shrink-0 mt-0.5" />
+        <div className="mt-5 p-5 sm:p-6 rounded-3xl bg-[#FBBF24]/25 border-2 border-[#1E293B] text-[#1E293B] flex items-start gap-4 shadow-pop-sm">
+          <div className="w-10 h-10 rounded-2xl bg-[#FBBF24] border-2 border-[#1E293B] flex items-center justify-center shrink-0 shadow-pop-sm">
+            <Heart className="w-5 h-5 fill-[#1E293B]" />
+          </div>
           <div>
-            <div className="text-xs font-bold text-teal-800 uppercase tracking-wider mb-1">
+            <div className="text-xs font-black uppercase tracking-wider text-[#1E293B] mb-1 font-heading">
               마음 처방전 한 줄
             </div>
-            <p className="text-sm sm:text-base font-semibold leading-relaxed">
+            <p className="text-base sm:text-lg font-heading font-extrabold leading-relaxed text-[#1E293B]">
               "{report.summarySentence}"
             </p>
           </div>
         </div>
 
         {/* Selected Emotions Chip List */}
-        <div className="mt-5 pt-4 border-t border-stone-100 flex items-center gap-2 flex-wrap text-xs text-stone-600">
-          <span className="font-medium">감지된 마음 기후:</span>
+        <div className="mt-6 pt-5 border-t-2 border-slate-100 flex items-center gap-2.5 flex-wrap text-xs text-[#1E293B] font-bold">
+          <span className="bg-slate-100 px-3 py-1 rounded-md border border-slate-300">감지된 마음 기후:</span>
           {selectedEmotions.map((emo) => (
             <span
               key={emo}
-              className="px-2.5 py-1 rounded-full bg-stone-100/90 text-stone-800 font-medium border border-stone-200/60"
+              className="px-3 py-1 rounded-full bg-[#FFFDF5] text-[#1E293B] font-bold border-2 border-[#1E293B] shadow-pop-sm"
             >
               {emo}
             </span>
@@ -176,11 +172,13 @@ ${report.actionPlans.find((p) => p.type === 'routine')?.title} - ${report.action
 
       {/* High Risk Emergency Notice if applicable */}
       {report.riskLevel === '위험' && (
-        <div className="p-4 sm:p-5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-950 flex items-start justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <ShieldAlert className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+        <div className="p-5 sm:p-6 rounded-3xl bg-[#F472B6]/20 border-2 border-[#1E293B] text-[#1E293B] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-pop-card">
+          <div className="flex items-start gap-3.5">
+            <div className="w-10 h-10 rounded-2xl bg-[#F472B6] border-2 border-[#1E293B] text-white flex items-center justify-center shrink-0 shadow-pop-sm">
+              <ShieldAlert className="w-5 h-5 stroke-[2.5]" />
+            </div>
             <div className="text-xs sm:text-sm">
-              <strong className="font-semibold block mb-0.5">
+              <strong className="font-heading font-extrabold text-base block mb-0.5 text-[#1E293B]">
                 안내: 마음의 에너지가 심각하게 소진된 상태입니다.
               </strong>
               혼자서 버티려 하지 마시고, 필요할 땐 언제든 전문 상담 전화(무료/24시간)의 도움을 받으세요.
@@ -188,7 +186,7 @@ ${report.actionPlans.find((p) => p.type === 'routine')?.title} - ${report.action
           </div>
           <button
             onClick={onOpenHotline}
-            className="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shrink-0 transition-colors cursor-pointer"
+            className="px-5 py-3 rounded-full bg-[#F472B6] hover:bg-[#EC4899] text-white font-heading font-extrabold text-xs border-2 border-[#1E293B] shadow-pop hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all shrink-0 cursor-pointer"
           >
             지원 번호 확인
           </button>
@@ -196,57 +194,90 @@ ${report.actionPlans.find((p) => p.type === 'routine')?.title} - ${report.action
       )}
 
       {/* 2. Psychological Analysis & Clinical Insights */}
-      <div className="bg-white/80 backdrop-blur-md rounded-3xl p-6 sm:p-8 border border-stone-200/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-4">
-        <div className="flex items-center gap-2">
-          <FileText className="w-5 h-5 text-teal-700" />
-          <h2 className="text-lg sm:text-xl font-bold text-stone-900">
+      <div className="bg-white border-2 border-[#1E293B] rounded-3xl p-6 sm:p-8 shadow-pop-card space-y-4">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl bg-[#8B5CF6] border-2 border-[#1E293B] text-white flex items-center justify-center shadow-pop-sm">
+            <FileText className="w-4 h-4 stroke-[2.5]" />
+          </div>
+          <h2 className="font-heading font-extrabold text-lg sm:text-xl text-[#1E293B]">
             임상 데이터 종합 마음 상태 분석
           </h2>
         </div>
-        <p className="text-sm sm:text-base text-stone-700 leading-relaxed whitespace-pre-line bg-stone-50/70 p-5 rounded-2xl border border-stone-200/60">
+        <p className="text-sm sm:text-base text-[#1E293B] font-medium leading-relaxed whitespace-pre-line bg-[#FFFDF5] p-5 sm:p-6 rounded-3xl border-2 border-[#1E293B] shadow-pop-sm">
           {report.psychologicalAnalysis}
         </p>
+
+        {/* AI Coach Chat History Review if present */}
+        {report.assessmentData.chatHistory && report.assessmentData.chatHistory.length > 1 && (
+          <div className="mt-4 pt-3 border-t-2 border-slate-100">
+            <details className="group">
+              <summary className="flex items-center justify-between text-xs sm:text-sm font-bold text-[#8B5CF6] cursor-pointer p-3 rounded-2xl bg-violet-50/60 hover:bg-violet-100/80 border-2 border-violet-200 transition-colors select-none">
+                <div className="flex items-center gap-2">
+                  <span>💬 AI 마음 친구 '포미'와 나눈 대화 ({report.assessmentData.chatHistory.length}개 메시지)</span>
+                </div>
+                <span className="text-xs text-slate-500 font-bold group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="mt-3 space-y-3 p-4 rounded-3xl bg-[#FFFDF5] border-2 border-[#1E293B] max-h-72 overflow-y-auto">
+                {report.assessmentData.chatHistory.map((m, idx) => (
+                  <div
+                    key={idx}
+                    className={`p-3.5 rounded-2xl text-xs leading-relaxed ${
+                      m.role === 'assistant'
+                        ? 'bg-white border-2 border-[#1E293B] text-[#1E293B] shadow-pop-sm'
+                        : 'bg-[#8B5CF6] text-white border-2 border-[#1E293B] ml-6 font-bold shadow-pop-sm'
+                    }`}
+                  >
+                    <div className="font-bold text-[10px] mb-1 opacity-80 font-mono">
+                      {m.role === 'assistant' ? '☁️ 마음 코치 포미' : '👤 나의 이야기'} • {m.timestamp}
+                    </div>
+                    <p className="whitespace-pre-line">{m.content}</p>
+                  </div>
+                ))}
+              </div>
+            </details>
+          </div>
+        )}
       </div>
 
       {/* 3. Metrics Breakdown Grid: Stress (PSS) + Resilience (KRQ) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Stress Metric Card */}
-        <div className="bg-white/80 backdrop-blur-md rounded-3xl p-6 border border-stone-200/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col justify-between">
+        <div className="bg-white border-2 border-[#1E293B] rounded-3xl p-6 sm:p-7 shadow-pop-card flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-rose-500" />
-                <h3 className="font-bold text-stone-900 text-base">
+                <span className="w-3.5 h-3.5 rounded-full bg-[#F472B6] border-2 border-[#1E293B]" />
+                <h3 className="font-heading font-extrabold text-[#1E293B] text-base sm:text-lg">
                   스트레스 부하 (PSS)
                 </h3>
               </div>
-              <span className="text-xs px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-700 font-semibold">
+              <span className="text-xs px-3 py-1 rounded-full bg-[#F472B6]/20 border-2 border-[#1E293B] text-[#1E293B] font-extrabold">
                 {scores.pssLevel}
               </span>
             </div>
 
             <div className="my-4 flex items-baseline gap-2">
-              <span className="text-3xl sm:text-4xl font-extrabold text-stone-900 font-mono">
+              <span className="text-4xl sm:text-5xl font-black text-[#1E293B] font-mono tracking-tight">
                 {scores.pssTotal}
               </span>
-              <span className="text-xs text-stone-500 font-medium">/ 16점 만점</span>
+              <span className="text-xs text-slate-500 font-bold">/ 16점 만점</span>
             </div>
 
             {/* Visual Gauge Bar */}
-            <div className="space-y-1.5">
-              <div className="w-full h-3 bg-stone-100 rounded-full overflow-hidden p-0.5 border border-stone-200">
+            <div className="space-y-2">
+              <div className="w-full h-4 bg-slate-100 rounded-full overflow-hidden p-0.5 border-2 border-[#1E293B]">
                 <div
                   className={`h-full rounded-full transition-all duration-700 ${
                     scores.pssTotal >= 12
-                      ? 'bg-rose-500'
+                      ? 'bg-[#F472B6]'
                       : scores.pssTotal >= 8
-                      ? 'bg-amber-500'
-                      : 'bg-emerald-500'
+                      ? 'bg-[#FBBF24]'
+                      : 'bg-[#34D399]'
                   }`}
-                  style={{ width: `${Math.max(5, scores.pssPercentage)}%` }}
+                  style={{ width: `${Math.max(8, scores.pssPercentage)}%` }}
                 />
               </div>
-              <div className="flex justify-between text-[10px] text-stone-400 font-medium">
+              <div className="flex justify-between text-[11px] text-slate-500 font-bold font-mono">
                 <span>0점 (안정)</span>
                 <span>8점 (주의)</span>
                 <span>16점 (위험)</span>
@@ -254,22 +285,22 @@ ${report.actionPlans.find((p) => p.type === 'routine')?.title} - ${report.action
             </div>
           </div>
 
-          <p className="text-xs text-stone-500 mt-4 pt-3 border-t border-stone-100">
+          <p className="text-xs text-slate-500 font-medium mt-5 pt-3 border-t-2 border-slate-100">
             돌발 상황에 대한 통제감과 과중한 심리적 책임감의 비중을 종합 산출한 지표입니다.
           </p>
         </div>
 
         {/* Resilience Metric Card (KRQ) */}
-        <div className="bg-white/80 backdrop-blur-md rounded-3xl p-6 border border-stone-200/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col justify-between">
+        <div className="bg-white border-2 border-[#1E293B] rounded-3xl p-6 sm:p-7 shadow-pop-card flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-teal-600" />
-                <h3 className="font-bold text-stone-900 text-base">
+                <span className="w-3.5 h-3.5 rounded-full bg-[#34D399] border-2 border-[#1E293B]" />
+                <h3 className="font-heading font-extrabold text-[#1E293B] text-base sm:text-lg">
                   회복탄력성 자원 (KRQ)
                 </h3>
               </div>
-              <span className="text-xs px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-800 font-semibold border border-teal-200">
+              <span className="text-xs px-3 py-1 rounded-full bg-[#34D399] text-[#1E293B] font-extrabold border-2 border-[#1E293B] shadow-pop-sm">
                 평균 {scores.krqScores.totalAverage} / 5.0점
               </span>
             </div>
@@ -286,15 +317,15 @@ ${report.actionPlans.find((p) => p.type === 'routine')?.title} - ${report.action
                 return (
                   <div key={dim.label} className="text-xs">
                     <div className="flex justify-between mb-1">
-                      <span className={`font-medium ${isLowest ? 'text-amber-800 font-semibold' : 'text-stone-700'}`}>
-                        {dim.label} {isLowest && <span className="text-[10px] text-amber-600 font-normal">(보완 추천)</span>}
+                      <span className={`font-bold ${isLowest ? 'text-[#1E293B]' : 'text-slate-700'}`}>
+                        {dim.label} {isLowest && <span className="px-1.5 py-0.5 rounded bg-[#FBBF24] border border-[#1E293B] text-[10px] font-bold ml-1">보완 추천</span>}
                       </span>
-                      <span className="font-mono text-stone-600 font-semibold">{dim.val} / 5</span>
+                      <span className="font-mono text-[#1E293B] font-extrabold">{dim.val} / 5</span>
                     </div>
-                    <div className="w-full h-2 bg-stone-100 rounded-full overflow-hidden">
+                    <div className="w-full h-2.5 bg-slate-100 border border-[#1E293B] rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full transition-all duration-700 ${
-                          isLowest ? 'bg-amber-500' : 'bg-teal-600'
+                          isLowest ? 'bg-[#FBBF24]' : 'bg-[#34D399]'
                         }`}
                         style={{ width: `${(dim.val / 5) * 100}%` }}
                       />
@@ -305,8 +336,8 @@ ${report.actionPlans.find((p) => p.type === 'routine')?.title} - ${report.action
             </div>
           </div>
 
-          <p className="text-xs text-stone-500 mt-2 pt-3 border-t border-stone-100">
-            가장 점수가 낮은 <strong className="text-stone-700 font-semibold">{scores.lowestKRQDimension.label}</strong>을 집중적으로 키울 수 있는 루틴이 처방되었습니다.
+          <p className="text-xs text-slate-500 font-medium mt-2 pt-3 border-t-2 border-slate-100">
+            가장 점수가 낮은 <strong className="text-[#1E293B] font-bold">{scores.lowestKRQDimension.label}</strong>을 집중적으로 키울 수 있는 루틴이 처방되었습니다.
           </p>
         </div>
       </div>
@@ -314,59 +345,61 @@ ${report.actionPlans.find((p) => p.type === 'routine')?.title} - ${report.action
       {/* 4. Action Plans (Immediate 3-min + Daily Routine) */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Zap className="w-5 h-5 text-amber-600" />
-            <h2 className="text-lg sm:text-xl font-bold text-stone-900">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-[#FBBF24] border-2 border-[#1E293B] text-[#1E293B] flex items-center justify-center shadow-pop-sm">
+              <Zap className="w-4 h-4 stroke-[2.5]" />
+            </div>
+            <h2 className="font-heading font-extrabold text-lg sm:text-xl text-[#1E293B]">
               맞춤형 멘탈 케어 액션 플랜
             </h2>
           </div>
-          <span className="text-xs text-stone-500">부담 없는 작은 실천부터 시작하세요</span>
+          <span className="text-xs text-slate-500 font-bold">부담 없는 작은 실천부터 시작하세요</span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {report.actionPlans.map((plan, idx) => {
             const isImmediate = plan.type === 'immediate';
             return (
               <div
                 key={idx}
-                className={`rounded-3xl p-6 border transition-all flex flex-col justify-between ${
+                className={`rounded-3xl p-6 sm:p-7 border-2 border-[#1E293B] transition-all flex flex-col justify-between shadow-pop-card ${
                   isImmediate
-                    ? 'bg-gradient-to-br from-teal-50/90 to-emerald-50/60 border-teal-200/80 shadow-[0_8px_30px_rgb(0,0,0,0.03)]'
-                    : 'bg-white/80 backdrop-blur-md border-stone-200/80 shadow-[0_8px_30px_rgb(0,0,0,0.03)]'
+                    ? 'bg-[#8B5CF6]/10'
+                    : 'bg-white'
                 }`}
               >
                 <div>
-                  <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center justify-between mb-3.5">
                     <span
-                      className={`text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wide ${
+                      className={`text-xs px-3.5 py-1.5 rounded-full font-heading font-extrabold border-2 border-[#1E293B] shadow-pop-sm ${
                         isImmediate
-                          ? 'bg-teal-700 text-white'
-                          : 'bg-stone-100 text-stone-700'
+                          ? 'bg-[#8B5CF6] text-white'
+                          : 'bg-[#FBBF24] text-[#1E293B]'
                       }`}
                     >
                       {isImmediate ? '⚡ 즉각 3분 액션' : '🌱 데일리 루틴'}
                     </span>
                     {isImmediate && (
-                      <span className="text-xs text-teal-700 font-semibold">소요시간 3분</span>
+                      <span className="text-xs text-[#8B5CF6] font-bold">소요시간 3분</span>
                     )}
                   </div>
 
-                  <h3 className="font-bold text-stone-900 text-base sm:text-lg mb-2">
+                  <h3 className="font-heading font-extrabold text-stone-900 text-lg mb-2">
                     {plan.title}
                   </h3>
-                  <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                  <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
                     {plan.description}
                   </p>
                 </div>
 
                 {isImmediate && (
-                  <div className="mt-5 pt-4 border-t border-teal-200/60">
+                  <div className="mt-6 pt-4 border-t-2 border-violet-200">
                     <button
                       id="btn-start-breathing-action"
                       onClick={onOpenBreathing}
-                      className="w-full py-3 rounded-2xl bg-teal-700 hover:bg-teal-800 text-white text-xs sm:text-sm font-semibold shadow-md shadow-teal-700/20 transition-all flex items-center justify-center gap-2 active:scale-98 cursor-pointer"
+                      className="w-full py-3.5 rounded-full bg-[#8B5CF6] hover:bg-[#7C3AED] text-white font-heading font-extrabold text-xs sm:text-sm border-2 border-[#1E293B] shadow-pop hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center justify-center gap-2 cursor-pointer"
                     >
-                      <Wind className="w-4 h-4" />
+                      <Wind className="w-4 h-4 stroke-[2.5]" />
                       <span>지금 3분 안심 호흡 시작하기</span>
                     </button>
                   </div>
@@ -378,16 +411,16 @@ ${report.actionPlans.find((p) => p.type === 'routine')?.title} - ${report.action
       </div>
 
       {/* 5. User Note & Journal Log Box */}
-      <div className="bg-white/80 backdrop-blur-md rounded-3xl p-6 sm:p-7 border border-stone-200/80 shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
-        <h3 className="text-sm font-bold text-stone-900 mb-1 flex items-center gap-2">
+      <div className="bg-white border-2 border-[#1E293B] rounded-3xl p-6 sm:p-8 shadow-pop-card">
+        <h3 className="font-heading font-extrabold text-base text-[#1E293B] mb-1 flex items-center gap-2">
           <span>마음 일기 / 감상 기록</span>
           {noteSaved && (
-            <span className="text-xs text-teal-600 font-normal flex items-center gap-1">
-              <Check className="w-3.5 h-3.5" /> 저장 완료!
+            <span className="text-xs text-[#34D399] font-bold flex items-center gap-1 bg-[#34D399]/20 px-2.5 py-0.5 rounded-full border border-[#34D399]">
+              <Check className="w-3.5 h-3.5 stroke-[3]" /> 저장 완료!
             </span>
           )}
         </h3>
-        <p className="text-xs text-stone-500 mb-3">
+        <p className="text-xs sm:text-sm text-slate-500 font-medium mb-3.5">
           진단을 마친 지금, 나에게 건네고 싶은 격려나 느낌을 기록해 두세요.
         </p>
         <div className="flex flex-col sm:flex-row gap-3">
@@ -396,32 +429,33 @@ ${report.actionPlans.find((p) => p.type === 'routine')?.title} - ${report.action
             value={userNote}
             onChange={(e) => setUserNote(e.target.value)}
             placeholder="예: 오늘은 조금 일찍 퇴근해서 따뜻한 차를 마셔야겠다."
-            className="flex-1 px-4 py-3 rounded-xl border border-stone-200 focus:border-teal-600 focus:ring-2 focus:ring-teal-600/20 text-xs sm:text-sm bg-stone-50/60 text-stone-800"
+            className="flex-1 px-5 py-3.5 rounded-full border-2 border-slate-300 focus:border-[#8B5CF6] focus:shadow-pop-violet text-xs sm:text-sm bg-[#FFFDF5] text-[#1E293B] font-medium outline-none transition-all"
           />
           <button
             onClick={handleSaveNote}
-            className="px-5 py-3 rounded-xl bg-stone-900 hover:bg-stone-800 text-stone-50 text-xs sm:text-sm font-medium transition-colors shrink-0 cursor-pointer"
+            className="px-7 py-3.5 rounded-full bg-[#FBBF24] hover:bg-[#F59E0B] text-[#1E293B] font-heading font-extrabold text-xs sm:text-sm border-2 border-[#1E293B] shadow-pop hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all shrink-0 cursor-pointer flex items-center justify-center gap-2"
           >
-            기록장에 저장
+            <BookmarkPlus className="w-4 h-4 stroke-[2.5]" />
+            <span>마음에 새기기</span>
           </button>
         </div>
       </div>
 
       {/* 6. Footer Actions: Copy, Retake, Crisis Help */}
-      <div className="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-stone-200/60">
-        <div className="flex items-center gap-2">
+      <div className="pt-4 flex flex-wrap items-center justify-between gap-4 border-t-2 border-slate-200">
+        <div className="flex items-center gap-3 flex-wrap">
           <button
             onClick={handleCopy}
-            className="px-4 py-2.5 rounded-xl bg-white hover:bg-stone-100 text-stone-700 text-xs font-medium border border-stone-200 shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+            className="px-5 py-3 rounded-full bg-white hover:bg-[#FBBF24] text-[#1E293B] text-xs sm:text-sm font-bold border-2 border-[#1E293B] shadow-pop-sm hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all flex items-center gap-2 cursor-pointer"
           >
             {copied ? (
               <>
-                <Check className="w-3.5 h-3.5 text-teal-600" />
-                <span className="text-teal-700 font-semibold">복사되었습니다</span>
+                <Check className="w-4 h-4 text-[#34D399] stroke-[3]" />
+                <span className="text-[#1E293B] font-extrabold">복사되었습니다</span>
               </>
             ) : (
               <>
-                <Copy className="w-3.5 h-3.5" />
+                <Copy className="w-4 h-4 stroke-[2.5]" />
                 <span>리포트 요약 복사</span>
               </>
             )}
@@ -429,9 +463,9 @@ ${report.actionPlans.find((p) => p.type === 'routine')?.title} - ${report.action
 
           <button
             onClick={onOpenHotline}
-            className="px-4 py-2.5 rounded-xl bg-white hover:bg-rose-50 text-stone-600 hover:text-rose-700 text-xs font-medium border border-stone-200 shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+            className="px-5 py-3 rounded-full bg-white hover:bg-[#F472B6]/20 text-[#1E293B] text-xs sm:text-sm font-bold border-2 border-[#1E293B] shadow-pop-sm hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all flex items-center gap-2 cursor-pointer"
           >
-            <HeartHandshake className="w-3.5 h-3.5" />
+            <HeartHandshake className="w-4 h-4 text-[#F472B6] stroke-[2.5]" />
             <span>24시간 전문 상담 안내</span>
           </button>
         </div>
@@ -439,12 +473,13 @@ ${report.actionPlans.find((p) => p.type === 'routine')?.title} - ${report.action
         <button
           id="btn-retake-diagnosis"
           onClick={onRetake}
-          className="px-5 py-2.5 rounded-xl bg-stone-200 hover:bg-stone-300 text-stone-800 text-xs sm:text-sm font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
+          className="px-6 py-3 rounded-full bg-white hover:bg-slate-100 text-[#1E293B] text-xs sm:text-sm font-heading font-extrabold border-2 border-[#1E293B] shadow-pop-sm hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all flex items-center gap-2 cursor-pointer ml-auto sm:ml-0"
         >
-          <RotateCcw className="w-4 h-4" />
+          <RotateCcw className="w-4 h-4 stroke-[2.5]" />
           <span>새로 진단하기</span>
         </button>
       </div>
     </div>
   );
 };
+
