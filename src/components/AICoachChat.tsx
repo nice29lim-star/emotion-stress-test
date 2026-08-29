@@ -90,6 +90,9 @@ export const AICoachChat: React.FC<AICoachChatProps> = ({
     setInputMessage('');
     setIsLoading(true);
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 9000);
+
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -98,34 +101,57 @@ export const AICoachChat: React.FC<AICoachChatProps> = ({
           messages: updatedMessages.map((m) => ({ role: m.role, content: m.content })),
           assessmentData,
         }),
+        signal: controller.signal,
       });
 
+      clearTimeout(timeoutId);
+
       if (!response.ok) {
-        throw new Error('Failed to get chat response');
+        throw new Error(`Chat API responded with status ${response.status}`);
       }
 
       const data = await response.json();
+      const assistantReply = data?.reply || generateLocalEmpathyReply(text);
+
       const assistantMsg: ChatMessage = {
         id: `msg_bot_${Date.now()}`,
         role: 'assistant',
-        content: data.reply || '마음속 이야기를 나누어 주셔서 진심으로 고마워요.',
+        content: assistantReply,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
 
       setMessages((prev) => [...prev, assistantMsg]);
     } catch (error) {
-      console.error('Chat error:', error);
+      console.warn('Chat request fallback activated:', error);
+      const fallbackReply = generateLocalEmpathyReply(text);
       const fallbackMsg: ChatMessage = {
         id: `msg_bot_${Date.now()}`,
         role: 'assistant',
-        content: '마음속에 품고 있던 무거운 짐을 솔직하게 꺼내어 말씀해 주셔서 감사해요. 당신의 모든 감정은 그 자체로 충분히 타당하고 소중합니다.',
+        content: fallbackReply,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages((prev) => [...prev, fallbackMsg]);
     } finally {
+      clearTimeout(timeoutId);
       setIsLoading(false);
       setTimeout(() => inputRef.current?.focus(), 100);
     }
+  };
+
+  const generateLocalEmpathyReply = (userText: string) => {
+    if (userText.includes('대견') || userText.includes('뿌듯') || userText.includes('잘') || userText.includes('칭찬') || userText.includes('소화')) {
+      return '스스로를 대견하게 바라보는 그 따뜻한 시선이 정말 멋져요! 고단한 일정 속에서도 하나씩 해내며 자신을 지켜낸 스스로에게 오늘 밤 편안한 쉼을 선물해 주는 건 어떨까요? ✨';
+    }
+    if (userText.includes('힘들') || userText.includes('지쳐') || userText.includes('피곤') || userText.includes('버거') || userText.includes('번아웃')) {
+      return '오늘 하루 정말 많은 에너지를 쏟아내셨군요. 그동안 묵묵히 버텨온 것만으로도 충분히 애쓰셨어요. 지금 가장 쉬고 싶은 순간은 언제인가요? 🛋️';
+    }
+    if (userText.includes('불안') || userText.includes('걱정') || userText.includes('어떡') || userText.includes('조급')) {
+      return '마음속에 소용돌이치는 생각들 때문에 숨이 가빠질 때가 있죠. 지금은 아무것도 완벽히 해결하지 않아도 괜찮아요. 천천히 숨을 한번 깊게 들이마셔 볼까요? 🌿';
+    }
+    if (userText.includes('일') || userText.includes('마감') || userText.includes('과제') || userText.includes('회사') || userText.includes('공부')) {
+      return '해야 할 일의 무게가 어깨를 짓누르고 있었군요. 그 무거운 짐을 잠시 제게 덜어놓으세요. 조금씩 천천히 가도 아무 문제 없답니다. ☕';
+    }
+    return '마음속에 담아두었던 솔직한 이야기를 들려주셔서 고마워요. 어떤 감정이든 편안하게 털어놓으셔도 괜찮아요. 또 다른 생각이나 전하고 싶은 마음이 있으신가요? 🌤️';
   };
 
   // Generate Report with chat history
