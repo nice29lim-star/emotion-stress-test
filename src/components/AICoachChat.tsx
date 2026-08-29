@@ -52,9 +52,11 @@ export const AICoachChat: React.FC<AICoachChatProps> = ({
     const emotionStr = emotions.join(', ');
     const noteSnippet = userNote ? ` "${userNote}"라고 남겨주신 메모를 읽으며 마음이 많이 쓰였어요.` : '';
     
+    const isPositiveEmotion = emotions.some((e) => ['평온한', '기대되는', '감사한', '자신감 있는', '안도하는'].includes(e));
+
     let introGreeting = `안녕하세요! 저는 당신의 마음 날씨 친구이자 멘탈 코치 **포미(Pomi)**예요. 🌤️\n\n오늘 마음에 **'${emotionStr}'** 기운이 맴돌고 계시군요.${noteSnippet}\n\n지금 마음을 무겁게 짓누르고 있거나 털어놓고 싶은 이야기가 있다면 무엇이든 편하게 들려주세요. 제가 온전히 곁에서 들어드릴게요.`;
 
-    if (emotions.includes('평온한') || emotions.includes('기대되는')) {
+    if (isPositiveEmotion && pssScore <= 6) {
       introGreeting = `안녕하세요! 마음 날씨 친구 **포미(Pomi)**예요. ☀️\n\n오늘 마음에 **'${emotionStr}'** 따스한 햇살이 비추고 있어 정말 다행이에요!${noteSnippet}\n\n오늘 당신의 기분을 밝게 밝혀준 특별한 순간이나 스스로에게 해주고 싶은 칭찬이 있나요? 편하게 이야기 들려주세요!`;
     }
 

@@ -20,6 +20,21 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({ onSubmit, onCanc
 
   // Step 1 State
   const [selectedEmotions, setSelectedEmotions] = useState<string[]>([]);
+  const [emotionCategory, setEmotionCategory] = useState<'all' | 'tired' | 'stress' | 'positive'>('all');
+
+  // Filtered emotions
+  const filteredEmotions = EMOTIONS.filter((emotion) => {
+    if (emotionCategory === 'tired') {
+      return ['지친', '무기력한', '답답한', '외로운'].includes(emotion.label);
+    }
+    if (emotionCategory === 'stress') {
+      return ['불안한', '초조한', '예민한', '짜증·분노', '부담스러운', '혼란스러운', '우울한'].includes(emotion.label);
+    }
+    if (emotionCategory === 'positive') {
+      return ['평온한', '기대되는', '감사한', '자신감 있는', '안도하는'].includes(emotion.label);
+    }
+    return true;
+  });
 
   // Step 2 State (PSS)
   const [pssAnswers, setPssAnswers] = useState<Record<string, number>>({});
@@ -142,10 +157,10 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({ onSubmit, onCanc
       {currentStep === 1 && (
         <div className="space-y-6">
           <div className="bg-white border-2 border-[#1E293B] rounded-3xl p-6 sm:p-8 shadow-pop-card">
-            <div className="mb-8">
+            <div className="mb-6">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FBBF24] border-2 border-[#1E293B] text-xs font-bold text-[#1E293B] mb-3 shadow-pop-sm">
                 <Sun className="w-3.5 h-3.5 stroke-[2.5]" />
-                <span>Q1. 실시간 감정 선택 (마음 기후)</span>
+                <span>Q1. 실시간 감정 선택 (16가지 마음 기후)</span>
               </div>
               <h2 className="font-heading text-2xl sm:text-3xl font-extrabold text-[#1E293B] tracking-tight">
                 지금 이 순간, 마음에 떠오르는 단어들을 골라주세요.
@@ -153,42 +168,68 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({ onSubmit, onCanc
               <p className="text-xs sm:text-sm text-slate-600 mt-2 font-medium">
                 복수 선택이 가능합니다. 솔직한 현재 기분을 가볍게 터치해 보세요. (선택 후 다음 단계로 이동)
               </p>
+
+              {/* Category Filter Tabs */}
+              <div className="flex flex-wrap gap-2 mt-5">
+                {[
+                  { id: 'all', label: '전체 (16)' },
+                  { id: 'tired', label: '☁️ 피로·소진 (4)' },
+                  { id: 'stress', label: '⚡ 스트레스·불안 (7)' },
+                  { id: 'positive', label: '☀️ 회복·긍정 (5)' },
+                ].map((tab) => {
+                  const isActive = emotionCategory === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setEmotionCategory(tab.id as any)}
+                      className={`px-3.5 py-1.5 rounded-full text-xs font-bold border-2 transition-all cursor-pointer ${
+                        isActive
+                          ? 'bg-[#1E293B] text-white border-[#1E293B] shadow-pop-sm'
+                          : 'bg-[#FFFDF5] text-slate-700 border-[#1E293B] hover:bg-white'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {EMOTIONS.map((emotion) => {
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-3.5">
+              {filteredEmotions.map((emotion) => {
                 const isSelected = selectedEmotions.includes(emotion.label);
                 return (
                   <button
                     key={emotion.id}
                     type="button"
                     onClick={() => toggleEmotion(emotion.label)}
-                    className={`text-left p-4.5 rounded-2xl border-2 transition-all flex items-start gap-3.5 relative cursor-pointer group ${
+                    className={`text-left p-3.5 sm:p-4 rounded-2xl border-2 transition-all flex items-start gap-3 relative cursor-pointer group ${
                       isSelected
-                        ? 'bg-[#8B5CF6] text-white border-[#1E293B] shadow-pop -translate-y-1'
+                        ? 'bg-[#8B5CF6] text-white border-[#1E293B] shadow-pop -translate-y-0.5'
                         : 'bg-[#FFFDF5] border-[#1E293B] hover:bg-white text-[#1E293B] shadow-pop-sm hover:-translate-y-0.5'
                     }`}
                   >
-                    <span className="text-3xl p-1 shrink-0 select-none group-hover:scale-110 transition-transform">
+                    <span className="text-2xl sm:text-3xl p-0.5 shrink-0 select-none group-hover:scale-110 transition-transform">
                       {emotion.emoji}
                     </span>
-                    <div className="flex-1 pr-6">
+                    <div className="flex-1 pr-6 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="font-heading font-bold text-base sm:text-lg">{emotion.label}</span>
+                        <span className="font-heading font-bold text-sm sm:text-base truncate">{emotion.label}</span>
                       </div>
-                      <p className={`text-xs mt-1 leading-relaxed ${isSelected ? 'text-violet-100' : 'text-slate-500 font-medium'}`}>
+                      <p className={`text-[11px] sm:text-xs mt-0.5 leading-relaxed line-clamp-2 ${isSelected ? 'text-violet-100' : 'text-slate-500 font-medium'}`}>
                         {emotion.description}
                       </p>
                     </div>
 
                     <div
-                      className={`w-6 h-6 rounded-full border-2 border-[#1E293B] flex items-center justify-center absolute top-4 right-4 transition-colors ${
+                      className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 border-[#1E293B] flex items-center justify-center absolute top-3.5 right-3.5 transition-colors ${
                         isSelected
                           ? 'bg-[#FBBF24] text-[#1E293B]'
                           : 'bg-white text-transparent'
                       }`}
                     >
-                      {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                      {isSelected && <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5 stroke-[3]" />}
                     </div>
                   </button>
                 );
