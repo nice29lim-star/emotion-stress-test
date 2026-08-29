@@ -60,10 +60,14 @@ export interface AssessmentPayload {
   timestamp: string;
 }
 
+export type ActionPlanType = 'immediate' | 'micro' | 'routine' | 'mindset';
+
 export interface ActionPlan {
-  type: 'immediate' | 'routine';
+  type: ActionPlanType | string;
+  categoryTag?: string;
   title: string;
   description: string;
+  duration?: string;
 }
 
 export type RiskLevel = '안전' | '주의' | '위험';

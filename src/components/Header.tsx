@@ -1,15 +1,13 @@
 import React from 'react';
-import { CloudSun, History, Wind, HeartHandshake, Sparkles } from 'lucide-react';
+import { CloudSun, HeartHandshake } from 'lucide-react';
 
 interface HeaderProps {
-  currentTab: 'assessment' | 'breathing';
-  onSelectTab: (tab: 'assessment' | 'breathing') => void;
+  onHomeClick?: () => void;
   onOpenHotline: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
-  currentTab,
-  onSelectTab,
+  onHomeClick,
   onOpenHotline,
 }) => {
   return (
@@ -18,7 +16,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Logo with Memphis Sticker feel */}
         <button
           id="btn-header-logo"
-          onClick={() => onSelectTab('assessment')}
+          onClick={onHomeClick}
           className="flex items-center gap-3 text-left group transition-transform active:scale-95 cursor-pointer"
         >
           <div className="w-11 h-11 rounded-2xl bg-[#8B5CF6] text-white flex items-center justify-center border-2 border-[#1E293B] shadow-pop-sm group-hover:-rotate-3 group-hover:scale-105 transition-all">
@@ -39,42 +37,22 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </button>
 
-        {/* Navigation Tabs (Candy & Pill Buttons) */}
-        <nav className="flex items-center gap-2 sm:gap-3">
-          <button
-            id="btn-nav-assessment"
-            onClick={() => onSelectTab('assessment')}
-            className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-heading font-extrabold border-2 border-[#1E293B] transition-all flex items-center gap-1.5 cursor-pointer ${
-              currentTab === 'assessment'
-                ? 'bg-[#8B5CF6] text-white shadow-pop-sm'
-                : 'bg-white text-[#1E293B] hover:bg-[#F1F5F9] shadow-none hover:shadow-pop-sm'
-            }`}
-          >
-            <CloudSun className="w-4 h-4 stroke-[2.5]" />
-            <span>마음 진단</span>
-          </button>
-
-          <button
-            id="btn-nav-breathing"
-            onClick={() => onSelectTab('breathing')}
-            className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-heading font-extrabold border-2 border-[#1E293B] bg-white hover:bg-[#34D399] text-[#1E293B] hover:text-[#1E293B] shadow-pop-sm hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all flex items-center gap-1.5 cursor-pointer"
-          >
-            <Wind className="w-4 h-4 stroke-[2.5]" />
-            <span className="hidden sm:inline">3분 안심 호흡</span>
-            <span className="sm:hidden">호흡</span>
-          </button>
-
+        {/* Right side actions: Hotline Modal button */}
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             id="btn-open-hotline"
             onClick={onOpenHotline}
             title="마음 긴급 지원 센터 안내"
-            className="w-10 h-10 rounded-full bg-white hover:bg-[#F472B6] hover:text-white text-[#1E293B] border-2 border-[#1E293B] flex items-center justify-center transition-all shadow-pop-sm hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 cursor-pointer ml-1"
+            className="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-full bg-white hover:bg-[#F472B6] hover:text-white text-[#1E293B] border-2 border-[#1E293B] font-heading font-extrabold text-xs sm:text-sm flex items-center gap-1.5 transition-all shadow-pop-sm hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 cursor-pointer"
           >
             <HeartHandshake className="w-4 h-4 stroke-[2.5]" />
+            <span className="hidden sm:inline">24시 마음안심 센터</span>
+            <span className="sm:hidden">도움센터</span>
           </button>
-        </nav>
+        </div>
       </div>
     </header>
   );
 };
+
 

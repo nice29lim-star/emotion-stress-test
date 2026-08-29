@@ -12,8 +12,7 @@ import confetti from 'canvas-confetti';
 import { CloudSun } from 'lucide-react';
 
 export default function App() {
-  // Navigation & view states
-  const [currentTab, setCurrentTab] = useState<'assessment' | 'breathing'>('assessment');
+  // Assessment stages
   const [assessmentStage, setAssessmentStage] = useState<'landing' | 'form' | 'chat' | 'loading' | 'result'>('landing');
 
   // Stored pending payload before or during chat
@@ -106,7 +105,6 @@ export default function App() {
     setActiveReport(null);
     setPendingPayload(null);
     setAssessmentStage('form');
-    setCurrentTab('assessment');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -114,15 +112,11 @@ export default function App() {
     <div className="min-h-screen bg-[#FFFDF5] text-[#1E293B] flex flex-col selection:bg-[#FBBF24] selection:text-[#1E293B]">
       {/* Top Sticky Header */}
       <Header
-        currentTab={currentTab}
-        onSelectTab={(tab) => {
-          if (tab === 'breathing') {
-            setShowBreathingModal(true);
-          } else {
-            setCurrentTab(tab);
-            if (tab === 'assessment' && assessmentStage === 'result' && !activeReport) {
-              setAssessmentStage('landing');
-            }
+        onHomeClick={() => {
+          if (assessmentStage === 'result' || assessmentStage === 'form' || assessmentStage === 'chat') {
+            setAssessmentStage('landing');
+            setActiveReport(null);
+            setPendingPayload(null);
           }
         }}
         onOpenHotline={() => setShowHotlineModal(true)}
@@ -130,40 +124,36 @@ export default function App() {
 
       {/* Main Content Body */}
       <main className="flex-1 flex flex-col">
-        {currentTab === 'assessment' && (
-          <>
-            {assessmentStage === 'landing' && (
-              <LandingHero
-                onStart={() => setAssessmentStage('form')}
-              />
-            )}
+        {assessmentStage === 'landing' && (
+          <LandingHero
+            onStart={() => setAssessmentStage('form')}
+          />
+        )}
 
-            {assessmentStage === 'form' && (
-              <AssessmentForm
-                onSubmit={handleProceedToChat}
-                onCancel={() => setAssessmentStage('landing')}
-              />
-            )}
+        {assessmentStage === 'form' && (
+          <AssessmentForm
+            onSubmit={handleProceedToChat}
+            onCancel={() => setAssessmentStage('landing')}
+          />
+        )}
 
-            {assessmentStage === 'chat' && pendingPayload && (
-              <AICoachChat
-                assessmentData={pendingPayload}
-                onCompleteChat={handleSubmitAssessment}
-                onCancelToForm={() => setAssessmentStage('form')}
-              />
-            )}
+        {assessmentStage === 'chat' && pendingPayload && (
+          <AICoachChat
+            assessmentData={pendingPayload}
+            onCompleteChat={handleSubmitAssessment}
+            onCancelToForm={() => setAssessmentStage('form')}
+          />
+        )}
 
-            {assessmentStage === 'loading' && <LoadingAnalysis />}
+        {assessmentStage === 'loading' && <LoadingAnalysis />}
 
-            {assessmentStage === 'result' && activeReport && (
-              <ReportDashboard
-                report={activeReport}
-                onRetake={handleRetake}
-                onOpenBreathing={() => setShowBreathingModal(true)}
-                onOpenHotline={() => setShowHotlineModal(true)}
-              />
-            )}
-          </>
+        {assessmentStage === 'result' && activeReport && (
+          <ReportDashboard
+            report={activeReport}
+            onRetake={handleRetake}
+            onOpenBreathing={() => setShowBreathingModal(true)}
+            onOpenHotline={() => setShowHotlineModal(true)}
+          />
         )}
       </main>
 

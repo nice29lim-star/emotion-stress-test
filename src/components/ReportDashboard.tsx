@@ -19,6 +19,10 @@ import {
   Sun,
   Flame,
   BookmarkPlus,
+  Coffee,
+  Lightbulb,
+  Sprout,
+  Clock,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -342,9 +346,9 @@ ${report.actionPlans.find((p) => p.type === 'routine')?.title} - ${report.action
         </div>
       </div>
 
-      {/* 4. Action Plans (Immediate 3-min + Daily Routine) */}
+      {/* 4. Action Plans (Immediate + Micro-healing + Routine + Mindset) */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-[#FBBF24] border-2 border-[#1E293B] text-[#1E293B] flex items-center justify-center shadow-pop-sm">
               <Zap className="w-4 h-4 stroke-[2.5]" />
@@ -353,54 +357,86 @@ ${report.actionPlans.find((p) => p.type === 'routine')?.title} - ${report.action
               맞춤형 멘탈 케어 액션 플랜
             </h2>
           </div>
-          <span className="text-xs text-slate-500 font-bold">부담 없는 작은 실천부터 시작하세요</span>
+          <span className="text-xs text-slate-500 font-bold bg-white px-3 py-1 rounded-full border border-slate-200 shadow-sm">
+            🌱 부담 없는 소소한 실천부터 시작해보세요
+          </span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {report.actionPlans.map((plan, idx) => {
-            const isImmediate = plan.type === 'immediate';
+            const planType = plan.type;
+            const isImmediate = planType === 'immediate';
+            const isMicro = planType === 'micro';
+            const isRoutine = planType === 'routine';
+            const isMindset = planType === 'mindset';
+
+            // Distinctive visual themes
+            let cardBg = 'bg-white';
+            let badgeBg = 'bg-[#FBBF24] text-[#1E293B]';
+            let badgeText = plan.categoryTag || '🌱 마음 루틴';
+            let IconComponent = Sprout;
+
+            if (isImmediate) {
+              cardBg = 'bg-[#8B5CF6]/10';
+              badgeBg = 'bg-[#8B5CF6] text-white';
+              badgeText = plan.categoryTag || '⚡ 3분 즉각 리셋';
+              IconComponent = Wind;
+            } else if (isMicro) {
+              cardBg = 'bg-[#FBBF24]/10';
+              badgeBg = 'bg-[#FBBF24] text-[#1E293B]';
+              badgeText = plan.categoryTag || '☕ 소소한 일상 힐링';
+              IconComponent = Coffee;
+            } else if (isRoutine) {
+              cardBg = 'bg-[#34D399]/10';
+              badgeBg = 'bg-[#34D399] text-[#1E293B]';
+              badgeText = plan.categoryTag || '🌱 마음근육 데일리 루틴';
+              IconComponent = Sprout;
+            } else if (isMindset) {
+              cardBg = 'bg-[#F472B6]/10';
+              badgeBg = 'bg-[#F472B6] text-white';
+              badgeText = plan.categoryTag || '💡 나를 위한 한마디';
+              IconComponent = Lightbulb;
+            }
+
             return (
               <div
                 key={idx}
-                className={`rounded-3xl p-6 sm:p-7 border-2 border-[#1E293B] transition-all flex flex-col justify-between shadow-pop-card ${
-                  isImmediate
-                    ? 'bg-[#8B5CF6]/10'
-                    : 'bg-white'
-                }`}
+                className={`rounded-3xl p-6 sm:p-7 border-2 border-[#1E293B] transition-all flex flex-col justify-between shadow-pop-card hover:-translate-y-0.5 ${cardBg}`}
               >
                 <div>
-                  <div className="flex items-center justify-between mb-3.5">
+                  <div className="flex items-center justify-between mb-3.5 gap-2">
                     <span
-                      className={`text-xs px-3.5 py-1.5 rounded-full font-heading font-extrabold border-2 border-[#1E293B] shadow-pop-sm ${
-                        isImmediate
-                          ? 'bg-[#8B5CF6] text-white'
-                          : 'bg-[#FBBF24] text-[#1E293B]'
-                      }`}
+                      className={`text-xs px-3.5 py-1.5 rounded-full font-heading font-extrabold border-2 border-[#1E293B] shadow-pop-sm flex items-center gap-1.5 ${badgeBg}`}
                     >
-                      {isImmediate ? '⚡ 즉각 3분 액션' : '🌱 데일리 루틴'}
+                      <IconComponent className="w-3.5 h-3.5 stroke-[2.5]" />
+                      <span>{badgeText}</span>
                     </span>
-                    {isImmediate && (
-                      <span className="text-xs text-[#8B5CF6] font-bold">소요시간 3분</span>
+
+                    {plan.duration && (
+                      <span className="text-xs text-slate-600 font-bold flex items-center gap-1 bg-white/80 px-2.5 py-1 rounded-full border border-[#1E293B]/30">
+                        <Clock className="w-3 h-3 stroke-[2.5] text-slate-500" />
+                        {plan.duration}
+                      </span>
                     )}
                   </div>
 
-                  <h3 className="font-heading font-extrabold text-stone-900 text-lg mb-2">
+                  <h3 className="font-heading font-extrabold text-[#1E293B] text-lg mb-2">
                     {plan.title}
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
+                  <p className="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
                     {plan.description}
                   </p>
                 </div>
 
                 {isImmediate && (
-                  <div className="mt-6 pt-4 border-t-2 border-violet-200">
+                  <div className="mt-6 pt-4 border-t-2 border-violet-200/80">
                     <button
                       id="btn-start-breathing-action"
                       onClick={onOpenBreathing}
-                      className="w-full py-3.5 rounded-full bg-[#8B5CF6] hover:bg-[#7C3AED] text-white font-heading font-extrabold text-xs sm:text-sm border-2 border-[#1E293B] shadow-pop hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                      className="w-full py-3 rounded-full bg-[#8B5CF6] hover:bg-[#7C3AED] text-white font-heading font-extrabold text-xs sm:text-sm border-2 border-[#1E293B] shadow-pop hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <Wind className="w-4 h-4 stroke-[2.5]" />
-                      <span>지금 3분 안심 호흡 시작하기</span>
+                      <span>지금 3분 안심 호흡 가이드 켜기</span>
                     </button>
                   </div>
                 )}
