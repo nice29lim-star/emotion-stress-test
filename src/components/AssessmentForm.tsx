@@ -256,7 +256,7 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({ onSubmit, onCanc
                 </div>
 
                 {/* 5-point choice buttons */}
-                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 pt-2">
+                <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-2.5 pt-2">
                   {PSS_OPTIONS.map((opt) => {
                     const isSelected = selectedVal === opt.value;
                     return (
@@ -264,16 +264,16 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({ onSubmit, onCanc
                         key={opt.value}
                         type="button"
                         onClick={() => handleSetPSS(q.id, opt.value)}
-                        className={`p-3.5 rounded-2xl border-2 text-center transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
+                        className={`min-h-[52px] sm:min-h-[60px] p-2.5 sm:p-3.5 rounded-2xl border-2 text-center transition-all flex flex-col items-center justify-center gap-0.5 sm:gap-1 cursor-pointer ${
                           isSelected
                             ? 'bg-[#F472B6] border-[#1E293B] text-white shadow-pop -translate-y-0.5 font-bold'
                             : 'bg-[#FFFDF5] border-[#1E293B] hover:bg-[#F1F5F9] text-[#1E293B] shadow-pop-sm font-medium'
                         }`}
                       >
-                        <span className="text-xs sm:text-sm font-bold whitespace-nowrap">
+                        <span className="text-[11px] sm:text-xs md:text-sm font-bold text-center leading-tight">
                           {opt.label}
                         </span>
-                        <span className={`text-[11px] font-mono ${isSelected ? 'text-white' : 'text-slate-500'}`}>
+                        <span className={`text-[10px] sm:text-[11px] font-mono ${isSelected ? 'text-white' : 'text-slate-500'}`}>
                           {opt.scoreText}
                         </span>
                       </button>
@@ -326,7 +326,7 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({ onSubmit, onCanc
                 </div>
 
                 {/* 5-point rating buttons */}
-                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 pt-2">
+                <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-2.5 pt-2">
                   {KRQ_OPTIONS.map((opt) => {
                     const isSelected = selectedVal === opt.value;
                     return (
@@ -334,16 +334,16 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({ onSubmit, onCanc
                         key={opt.value}
                         type="button"
                         onClick={() => handleSetKRQ(q.id, opt.value)}
-                        className={`p-3.5 rounded-2xl border-2 text-center transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
+                        className={`min-h-[52px] sm:min-h-[60px] p-2.5 sm:p-3.5 rounded-2xl border-2 text-center transition-all flex flex-col items-center justify-center gap-0.5 sm:gap-1 cursor-pointer ${
                           isSelected
                             ? 'bg-[#34D399] border-[#1E293B] text-[#1E293B] shadow-pop -translate-y-0.5 font-bold'
                             : 'bg-[#FFFDF5] border-[#1E293B] hover:bg-[#F1F5F9] text-[#1E293B] shadow-pop-sm font-medium'
                         }`}
                       >
-                        <span className="text-xs sm:text-sm font-bold whitespace-nowrap">
+                        <span className="text-[11px] sm:text-xs md:text-sm font-bold text-center leading-tight">
                           {opt.label}
                         </span>
-                        <span className="text-[11px] text-slate-600 font-mono">
+                        <span className="text-[10px] sm:text-[11px] text-slate-600 font-mono">
                           {opt.scoreText}
                         </span>
                       </button>
