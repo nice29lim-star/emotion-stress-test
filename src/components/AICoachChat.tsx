@@ -78,6 +78,12 @@ export const AICoachChat: React.FC<AICoachChatProps> = ({
     const text = (textToSend || inputMessage).trim();
     if (!text || isLoading) return;
 
+    // Special quick action
+    if (text === '이제 리포트 확인할래 📑' || text === '리포트 확인하기') {
+      handleFinishAndGenerateReport();
+      return;
+    }
+
     const userMsg: ChatMessage = {
       id: `msg_user_${Date.now()}`,
       role: 'user',
@@ -91,7 +97,7 @@ export const AICoachChat: React.FC<AICoachChatProps> = ({
     setIsLoading(true);
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 9000);
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
 
     try {
       const response = await fetch('/api/chat', {
@@ -139,6 +145,14 @@ export const AICoachChat: React.FC<AICoachChatProps> = ({
   };
 
   const generateLocalEmpathyReply = (userText: string) => {
+    const turnCount = messages.filter((m) => m.role === 'user').length;
+    if (turnCount >= 8) {
+      return '오늘 저와 많은 이야기들을 솔직하게 나누어 주셔서 정말 고마워요. 🌸 지금까지 나눈 이야기들을 바탕으로 마음 분석 리포트를 확인해 보시는 건 어떨까요? 언제든 상단의 **리포트 생성하기**를 눌러주세요! ✨';
+    }
+
+    if (userText.includes('쉬지') || userText.includes('쉬고') || userText.includes('쉬질') || userText.includes('휴식')) {
+      return '쉬고 싶은 마음이 간절한데도 온전히 쉬지 못할 때, 그 답답함과 마음의 부담감이 정말 크죠. 혹시 마음 한구석에서 "지금 쉬면 안 돼"라며 스스로를 몰아세우고 있는 건 아닐까요? 🥺';
+    }
     if (userText.includes('대견') || userText.includes('뿌듯') || userText.includes('잘') || userText.includes('칭찬') || userText.includes('소화')) {
       return '스스로를 대견하게 바라보는 그 따뜻한 시선이 정말 멋져요! 고단한 일정 속에서도 하나씩 해내며 자신을 지켜낸 스스로에게 오늘 밤 편안한 쉼을 선물해 주는 건 어떨까요? ✨';
     }
@@ -165,6 +179,35 @@ export const AICoachChat: React.FC<AICoachChatProps> = ({
 
   const userMessagesCount = messages.filter((m) => m.role === 'user').length;
 
+  // Dynamic quick suggestions based on conversation phase
+  const getContextualQuickReplies = () => {
+    if (userMessagesCount >= 6) {
+      return [
+        '이제 리포트 확인할래 📑',
+        '마음이 한결 가벼워졌어 고마워 💛',
+        '쉬는 것에 대한 죄책감을 어떻게 덜어낼까? 🛋️',
+        '앞으로 어떤 루틴을 실천해보면 좋을까? 🌱',
+      ];
+    }
+    if (userMessagesCount >= 3) {
+      return [
+        '쉬고 싶은데 마음이 계속 조급해 ⏳',
+        '혼자 다 짊어지려고 하니 너무 벅차 🥺',
+        '작은 일에도 예민해지는 것 같아 🌧️',
+        '이제 리포트 확인할래 📑',
+      ];
+    }
+    return [
+      '오늘 유독 집중하기 힘들고 쉬지를 못하겠어 🛋️',
+      '해야 할 일이 산더미인데 마음만 조급해요 ⏳',
+      '그래도 오늘 일정 잘 소화해서 대견해 ✨',
+      '주변 시선이나 책임감이 너무 무거워요 🌿',
+      '마음이 가라앉아서 따뜻한 위로가 필요해 ☕',
+    ];
+  };
+
+  const currentQuickReplies = getContextualQuickReplies();
+
   return (
     <div className="w-full max-w-4xl mx-auto py-8 sm:py-12 px-4 sm:px-6 flex flex-col min-h-[calc(100vh-140px)]">
       {/* Top Banner: Coach Identity Card */}
@@ -187,9 +230,14 @@ export const AICoachChat: React.FC<AICoachChatProps> = ({
                 <Sparkles className="w-3.5 h-3.5" />
                 <span>AI 공감 대화</span>
               </span>
+              <span className="px-2.5 py-0.5 rounded-full bg-[#FEF08A] text-[#854D0E] border-2 border-[#1E293B] text-xs font-bold shadow-pop-sm">
+                대화 {userMessagesCount} / 10회
+              </span>
             </div>
             <p className="text-xs sm:text-sm text-slate-600 font-medium mt-1">
-              입력하신 감정과 스트레스 데이터를 바탕으로 1:1 맞춤 대화를 나눕니다.
+              {userMessagesCount >= 8
+                ? '포미와 충분한 이야기를 나누었어요! 이제 맞춤 리포트를 확인해보세요. ✨'
+                : '입력하신 감정과 스트레스 데이터를 바탕으로 1:1 맞춤 대화를 나눕니다.'}
             </p>
           </div>
         </div>
@@ -203,6 +251,22 @@ export const AICoachChat: React.FC<AICoachChatProps> = ({
           <span>리포트 생성하기</span>
         </button>
       </div>
+
+      {/* Mid-chat Guidance Banner when turns >= 4 */}
+      {userMessagesCount >= 4 && (
+        <div className="mb-4 px-4 py-3 bg-[#EEF2FF] border-2 border-[#1E293B] rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-2.5 shadow-pop-sm">
+          <div className="flex items-center gap-2 text-xs font-bold text-[#4338CA]">
+            <Sparkles className="w-4 h-4 text-[#6366F1] shrink-0" />
+            <span>포미와 마음을 충분히 나누셨다면 언제든 리포트 확인 버튼을 눌러보세요.</span>
+          </div>
+          <button
+            onClick={handleFinishAndGenerateReport}
+            className="px-3.5 py-1.5 rounded-full bg-[#4F46E5] hover:bg-[#4338CA] text-white text-xs font-bold border border-[#1E293B] shadow-sm hover:scale-105 transition-all shrink-0 cursor-pointer"
+          >
+            리포트 확인하기 📑
+          </button>
+        </div>
+      )}
 
       {/* Main Chat Conversation Container */}
       <div className="flex-1 bg-white border-2 border-[#1E293B] rounded-3xl p-4 sm:p-6 shadow-pop-card flex flex-col overflow-hidden">
@@ -247,6 +311,31 @@ export const AICoachChat: React.FC<AICoachChatProps> = ({
             );
           })}
 
+          {/* In-Chat Milestone Recommendation Card when reaching 8+ turns */}
+          {userMessagesCount >= 8 && !isLoading && (
+            <div className="p-4 rounded-2xl bg-[#FDF2F8] border-2 border-[#DB2777] shadow-pop-sm flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left animate-in fade-in duration-300">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#F472B6] text-white border-2 border-[#1E293B] flex items-center justify-center text-lg font-bold shrink-0 shadow-pop-sm">
+                  ✨
+                </div>
+                <div>
+                  <div className="text-xs sm:text-sm font-extrabold text-[#9D174D]">
+                    포미와 속마음을 깊이 나누었어요!
+                  </div>
+                  <div className="text-[11px] sm:text-xs text-[#BE185D] font-medium mt-0.5">
+                    지금까지 나눈 대화가 반영된 맞춤형 마음 리포트를 확인해보세요.
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={handleFinishAndGenerateReport}
+                className="px-4 py-2.5 rounded-full bg-[#DB2777] hover:bg-[#BE185D] text-white font-extrabold text-xs border-2 border-[#1E293B] shadow-pop-sm hover:scale-105 transition-all cursor-pointer shrink-0"
+              >
+                종합 리포트 열기 📝
+              </button>
+            </div>
+          )}
+
           {/* Loading Indicator */}
           {isLoading && (
             <div className="flex items-start gap-3 justify-start">
@@ -254,7 +343,7 @@ export const AICoachChat: React.FC<AICoachChatProps> = ({
                 ☁️
               </div>
               <div className="bg-[#FFFDF5] border-2 border-[#1E293B] rounded-3xl rounded-tl-sm px-5 py-3.5 text-[#1E293B] font-bold text-xs shadow-pop-sm flex items-center gap-2">
-                <span>포미가 다정한 답글을 적고 있어요</span>
+                <span>포미가 마음을 담아 답글을 적고 있어요</span>
                 <div className="flex gap-1">
                   <span className="w-2 h-2 rounded-full bg-[#8B5CF6] animate-bounce" />
                   <span className="w-2 h-2 rounded-full bg-[#F472B6] animate-bounce delay-100" />
@@ -271,10 +360,10 @@ export const AICoachChat: React.FC<AICoachChatProps> = ({
         <div className="mt-4 pt-3 border-t-2 border-slate-100">
           <div className="flex items-center gap-1.5 text-xs text-slate-500 mb-2.5 font-bold">
             <Lightbulb className="w-4 h-4 text-[#FBBF24] fill-[#FBBF24]" />
-            <span>이런 이야기를 털어놓아 보세요:</span>
+            <span>{userMessagesCount >= 6 ? '대화를 마무리하거나 더 이야기해보세요:' : '이런 이야기를 털어놓아 보세요:'}</span>
           </div>
           <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-            {quickReplies.map((reply, i) => (
+            {currentQuickReplies.map((reply, i) => (
               <button
                 key={i}
                 onClick={() => handleSendMessage(reply)}

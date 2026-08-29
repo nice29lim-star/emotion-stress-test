@@ -161,20 +161,26 @@ export async function handleChatLogic(messages: any[], assessmentData: any) {
   const lowestDimension = assessmentData?.scores?.lowestKRQDimension?.label || '자기조절능력';
   const userNotes = assessmentData?.userNotes ? `"${assessmentData.userNotes}"` : '없음';
 
-  const COACH_SYSTEM_PROMPT = `당신은 사용자의 마음 날씨를 돌보는 따뜻하고 공감 가득한 AI 멘탈 케어 코치 '포미(Pomi, 마음구름)'입니다.
+  const userMessages = messages.filter((m: any) => m.role === 'user');
+  const userTurnCount = userMessages.length;
 
-[사용자의 기본 진단 데이터]
-- 감지된 감정: ${emotions}
-- 스트레스 부하(PSS): 16점 만점 중 ${pssTotal}점 (${pssLevel})
+  const COACH_SYSTEM_PROMPT = `당신은 사용자의 마음 날씨를 돌보는 가장 따뜻하고 지혜로운 AI 멘탈 케어 단짝 친구 '포미(Pomi, 마음구름)'입니다.
+
+[사용자의 진단 데이터]
+- 감정 상태: ${emotions}
+- 스트레스 부하: ${pssTotal}점 / 16점 만점 (${pssLevel})
 - 회복탄력성 취약 영역: ${lowestDimension}
-- 사용자가 진단 폼에서 남긴 한 줄 메모: ${userNotes}
+- 진단 메모: ${userNotes}
+- 현재 대화 진행: ${userTurnCount}번째 턴
 
-[대화 및 상담 원칙]
-1. 사용자의 마음 상태를 무조건적으로 수용하고 깊이 공감합니다.
-2. 절대 훈계하거나 섣부른 조언을 길게 늘어놓지 않습니다.
-3. 친절하고 다정한 경어체(따뜻하고 부드러운 대화체)를 사용합니다.
-4. 한 번에 너무 길게 말하지 않고 2~3문장 내외로 자연스럽게 대화하세요. (깊은 공감 1~2문장 + 부담 없는 따뜻한 질문 또는 위로 1문장)
-5. 사용자가 편안하게 마음속 이야기나 오늘 겪은 일, 감정의 원인을 털어놓을 수 있도록 안전하고 온화한 분위기를 만들어주세요.`;
+[대화 원칙 - 진정한 친구 같은 티키타카]
+1. 사용자가 방금 한 말의 구체적인 상황과 숨은 감정(예: '쉬고 싶은데 쉬지 못하는 죄책감/조급함', '인간관계의 상처', '일에 대한 압박' 등)을 정확히 포착하여 깊이 공감해주세요.
+2. 형식적인 앵무새식 인사("이야기를 들려주셔서 고마워요")를 매번 반복하지 마세요! 대화의 맥락을 이어가며 친구처럼 자연스럽게 끄덕이고 답해주세요.
+3. 말투: 다정하고 포근한 어투(부드러운 경어체 또는 따뜻한 반존댓말 느낌).
+4. 길이: 2~4문장으로 읽기 편안하게 (진심 어린 공감과 맞장구 + 편안하게 생각해보거나 쉬어갈 수 있는 질문 또는 따뜻한 위로 1문장).
+5. 턴 수에 따른 흐름:
+   - 1~6턴: 사용자의 마음속 이야기를 깊이 경청하고 원인과 감정을 함께 탐색하기.
+   - 7~10턴 이상: 충분히 교감한 후, 지금까지 나눈 이야기를 따뜻하게 매듭지으며 "오늘 저에게 털어놓아 주신 마음들을 잘 담아두었어요. 지금까지 나눈 이야기들을 바탕으로 맞춤 마음 리포트를 확인해 보시는 건 어떨까요? 📝✨" 하고 자연스럽게 리포트 확인을 다정하게 제안하기.`;
 
   const ai = getGeminiClient();
 
@@ -185,7 +191,7 @@ export async function handleChatLogic(messages: any[], assessmentData: any) {
     // Initial synthetic context so the conversation starts with user turn
     rawContents.push({
       role: 'user',
-      parts: [{ text: `안녕하세요 포미. 오늘 제 마음 진단 결과(감정: ${emotions}, 스트레스: ${pssTotal}점, 취약영역: ${lowestDimension})를 바탕으로 대화를 시작하고 싶어요.` }],
+      parts: [{ text: `안녕하세요 포미. 오늘 제 마음 진단 결과(감정: ${emotions}, 스트레스: ${pssTotal}점, 취약영역: ${lowestDimension})를 바탕으로 편안하게 이야기 나누고 싶어요.` }],
     });
 
     for (const m of messages) {
@@ -204,6 +210,24 @@ export async function handleChatLogic(messages: any[], assessmentData: any) {
       }
     }
 
+    // Try gemini-2.5-flash first for ultra-fast, reliable and warm conversation, then gemini-3.7-flash
+    try {
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: rawContents,
+        config: {
+          systemInstruction: COACH_SYSTEM_PROMPT,
+          temperature: 0.8,
+        },
+      });
+
+      if (response.text?.trim()) {
+        return response.text.trim();
+      }
+    } catch (err: any) {
+      console.warn('gemini-2.5-flash chat error, trying gemini-3.7-flash fallback:', err?.message);
+    }
+
     try {
       const response = await ai.models.generateContent({
         model: 'gemini-3.7-flash',
@@ -214,46 +238,80 @@ export async function handleChatLogic(messages: any[], assessmentData: any) {
         },
       });
 
-      return response.text?.trim() || '이야기해 주셔서 감사해요. 당신의 마음에 항상 귀 기울이고 있어요.';
-    } catch (err: any) {
-      console.warn('gemini-3.7-flash chat error, trying gemini-2.5-flash fallback:', err?.message);
-      try {
-        const response = await ai.models.generateContent({
-          model: 'gemini-2.5-flash',
-          contents: rawContents,
-          config: {
-            systemInstruction: COACH_SYSTEM_PROMPT,
-            temperature: 0.8,
-          },
-        });
-        return response.text?.trim() || '이야기해 주셔서 감사해요. 당신의 마음에 항상 귀 기울이고 있어요.';
-      } catch (fallbackErr) {
-        console.error('All Gemini chat models failed, using intelligent rule reply:', fallbackErr);
-        return getHeuristicChatReply(messages);
+      if (response.text?.trim()) {
+        return response.text.trim();
       }
+    } catch (fallbackErr) {
+      console.error('All Gemini chat models failed, using intelligent rule reply:', fallbackErr);
     }
+
+    return getHeuristicChatReply(messages);
   } else {
     return getHeuristicChatReply(messages);
   }
 }
 
 export function getHeuristicChatReply(messages: any[]) {
-  const lastUserMsg = messages.filter((m: any) => m.role === 'user').slice(-1)[0]?.content || '';
-  
-  if (lastUserMsg.includes('대견') || lastUserMsg.includes('뿌듯') || lastUserMsg.includes('잘') || lastUserMsg.includes('칭찬')) {
-    return '스스로를 대견하게 바라보는 그 따뜻한 마음이 정말 빛나요! 힘든 일정 속에서도 꿋꿋하게 해낸 자신에게 오늘 밤 작은 포상이나 푹 쉴 수 있는 시간을 선물해 주는 건 어떨까요? ✨';
-  }
-  if (lastUserMsg.includes('힘들') || lastUserMsg.includes('지쳐') || lastUserMsg.includes('피곤') || lastUserMsg.includes('번아웃')) {
-    return '오늘 하루 정말 많은 에너지를 쏟아내셨군요. 그동안 버텨온 것만으로도 충분히 애쓰셨어요. 지금 가장 쉬고 싶은 순간은 언제인가요? 🛋️';
-  }
-  if (lastUserMsg.includes('불안') || lastUserMsg.includes('걱정') || lastUserMsg.includes('어떡') || lastUserMsg.includes('조급')) {
-    return '마음속에 소용돌이치는 생각들 때문에 숨이 가빠질 때가 있죠. 지금은 아무것도 완벽히 해결하지 않아도 괜찮아요. 천천히 숨을 한번 깊게 들이마셔 볼까요? 🌿';
-  }
-  if (lastUserMsg.includes('일') || lastUserMsg.includes('마감') || lastUserMsg.includes('과제') || lastUserMsg.includes('회사')) {
-    return '해야 할 일의 무게가 마음을 짓누르고 있었군요. 그 무게를 잠시 제게 덜어놓으세요. 조금씩 천천히 가도 괜찮습니다. ☕';
+  const userMessages = messages.filter((m: any) => m.role === 'user');
+  const lastUserMsg = userMessages.slice(-1)[0]?.content || '';
+  const turnCount = userMessages.length;
+
+  if (turnCount >= 8) {
+    return `오늘 저와 마음속 깊은 이야기들을 솔직하게 나누어 주셔서 정말 고마워요. 🌸\n\n대화를 나누며 스스로를 돌아보는 것만으로도 마음의 무게가 조금은 가벼워지셨기를 바라요. 지금까지 나눈 이야기들을 토대로 맞춤형 멘탈 케어 리포트를 확인해 보시는 건 어떨까요? 언제든 상단의 **'리포트 생성하기'**를 눌러주세요! ✨`;
   }
 
-  return '마음속에 담아두었던 솔직한 이야기를 들려주셔서 고마워요. 어떤 감정이든 편안하게 털어놓으셔도 괜찮아요. 또 다른 생각이나 전하고 싶은 마음이 있으신가요? 🌤️';
+  if (lastUserMsg.includes('쉬지') || lastUserMsg.includes('쉬고') || lastUserMsg.includes('쉬질') || lastUserMsg.includes('휴식')) {
+    const replies = [
+      '쉬고 싶은 마음이 간절한데도 몸이나 마음이 멈추지 못할 때, 그 답답함과 죄책감이 정말 크죠. 혹시 마음 한구석에서 "지금 쉬면 안 돼"라며 스스로를 재촉하고 있는 건 아닐까요? 🥺',
+      '쉬는 것조차 마음 편히 허락되지 않는 상황이군요... 온전히 쉬지 못하게 가로막는 생각이나 해야 할 일들이 어떤 것인지 조금 더 털어놓아 주실 수 있나요? ☕',
+      '충분히 쉴 자격이 있는데도 멈추기가 참 어렵죠. 오늘 딱 10분만이라도 세상의 모든 알림을 끄고 오직 숨만 쉬는 시간을 스스로에게 허락해 주는 건 어떨까요? 🌿',
+    ];
+    return replies[Math.floor(Math.random() * replies.length)];
+  }
+
+  if (lastUserMsg.includes('대견') || lastUserMsg.includes('뿌듯') || lastUserMsg.includes('잘') || lastUserMsg.includes('칭찬') || lastUserMsg.includes('소화')) {
+    const replies = [
+      '스스로를 대견하게 바라보는 그 따뜻한 시선이 정말 반짝여요! ✨ 벅찬 일정 속에서도 도망치지 않고 버텨낸 스스로에게 오늘 밤 가장 포근한 쉼을 선물해 주세요.',
+      '맞아요! 남들은 몰라도 내가 얼마나 애썼는지는 내가 가장 잘 알잖아요. 그런 나를 꼭 안아주고 칭찬해 주는 당신의 마음근육이 참 단단해요. 💛',
+    ];
+    return replies[Math.floor(Math.random() * replies.length)];
+  }
+
+  if (lastUserMsg.includes('힘들') || lastUserMsg.includes('지쳐') || lastUserMsg.includes('피곤') || lastUserMsg.includes('버거') || lastUserMsg.includes('번아웃')) {
+    const replies = [
+      '오늘 하루 정말 많은 에너지를 쏟아내셨군요. 그동안 묵묵히 버텨온 것만으로도 충분히 애쓰셨어요. 지금 가장 덜어내고 싶은 짐은 무엇인가요? 🛋️',
+      '몸도 마음도 배터리가 깜빡이고 있는 상태군요. 지금 당장은 아무것도 완벽히 해내지 않아도 괜찮아요. 제 곁에서 잠시 편안하게 기대어 쉬어가세요. ☁️',
+    ];
+    return replies[Math.floor(Math.random() * replies.length)];
+  }
+
+  if (lastUserMsg.includes('불안') || lastUserMsg.includes('걱정') || lastUserMsg.includes('어떡') || lastUserMsg.includes('조급') || lastUserMsg.includes('두려')) {
+    const replies = [
+      '마음속에 소용돌이치는 생각들 때문에 숨이 가빠질 때가 있죠. 지금 느끼는 불안은 당신이 이 일을 소중하게 생각하고 있다는 증거이기도 해요. 천천히 숨을 깊게 내쉬어 볼까요? 🌿',
+      '아직 일어나지 않은 일에 대한 걱정들이 마음을 가득 채우고 있군요. 그 걱정의 구름을 잠시 머리 위에 띄워두고, 지금 이 순간의 안전한 감각에 집중해 보아요. 🌤️',
+    ];
+    return replies[Math.floor(Math.random() * replies.length)];
+  }
+
+  if (lastUserMsg.includes('일') || lastUserMsg.includes('마감') || lastUserMsg.includes('과제') || lastUserMsg.includes('회사') || lastUserMsg.includes('공부') || lastUserMsg.includes('야근')) {
+    const replies = [
+      '해야 할 일의 무게가 끝없이 어깨를 짓누르고 있었군요. 그 무거운 짐을 잠시 제게 덜어놓으세요. 조금씩 천천히 가도 괜찮습니다. ☕',
+      '세상 모든 일을 혼자 다 짊어지려 하지 않아도 돼요. 오늘 할 일 중 딱 하나만 내일로 미뤄보는 작은 용기를 내보는 건 어떨까요? 🍃',
+    ];
+    return replies[Math.floor(Math.random() * replies.length)];
+  }
+
+  if (lastUserMsg.includes('사람') || lastUserMsg.includes('친구') || lastUserMsg.includes('상사') || lastUserMsg.includes('가족') || lastUserMsg.includes('관계') || lastUserMsg.includes('눈치')) {
+    return '사람과의 관계에서 오는 피로감은 마음에 정말 깊은 생채기를 남기죠. 다른 사람들의 기대나 시선보다 지금은 내 마음의 평화가 가장 소중해요. 어떤 상황이 특히 마음을 힘들게 했나요? 🤍';
+  }
+
+  const generalReplies = [
+    '그렇게 느끼셨군요... 마음속 깊은 곳에 있는 생각을 솔직하게 꺼내어 말씀해 주셔서 진심으로 고마워요. 그 감정에 대해 조금 더 이야기해 주실 수 있나요? 🌤️',
+    '마음속에 떠오른 그 생각들이 참 많은 의미를 담고 있네요. 편안하게 어떤 이야기든 털어놓아 주세요, 제가 곁에서 따뜻하게 귀 기울이고 있을게요. 🌿',
+    '이야기를 들으니 그동안 혼자 마음고생이 많으셨을 것 같아요. 언제든 당신 편에서 응원하고 지지할게요. 또 마음에 걸리는 부분이 있다면 편히 말씀해 주세요. 💛',
+  ];
+
+  return generalReplies[Math.floor(Math.random() * generalReplies.length)];
 }
 
 export async function handleAnalyzeLogic(assessmentData: any) {
