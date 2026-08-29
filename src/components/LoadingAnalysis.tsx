@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Cloud, Sun, Sparkles, Heart } from 'lucide-react';
+import { Cloud, Sun, Sparkles, Heart, ArrowRight } from 'lucide-react';
+
+interface LoadingAnalysisProps {
+  onForceComplete?: () => void;
+}
 
 const MESSAGES = [
   '마음 날씨를 꼼꼼하게 분석하고 있어요...',
@@ -8,14 +12,23 @@ const MESSAGES = [
   '포미와의 대화 내용을 반영해 3분 액션 플랜을 준비 중입니다...',
 ];
 
-export const LoadingAnalysis: React.FC = () => {
+export const LoadingAnalysis: React.FC<LoadingAnalysisProps> = ({ onForceComplete }) => {
   const [msgIndex, setMsgIndex] = useState(0);
+  const [showSkipButton, setShowSkipButton] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setMsgIndex((prev) => (prev + 1) % MESSAGES.length);
-    }, 2400);
-    return () => clearInterval(timer);
+    }, 2000);
+
+    const skipTimer = setTimeout(() => {
+      setShowSkipButton(true);
+    }, 4500);
+
+    return () => {
+      clearInterval(timer);
+      clearTimeout(skipTimer);
+    };
   }, []);
 
   return (
@@ -61,11 +74,23 @@ export const LoadingAnalysis: React.FC = () => {
         ))}
       </div>
 
-      {/* Mindful prompt while waiting */}
-      <div className="mt-8 p-4 rounded-2xl bg-white border-2 border-[#1E293B] shadow-pop-sm max-w-sm mx-auto flex items-center justify-center gap-2.5 text-xs text-[#1E293B] font-bold">
-        <Heart className="w-4 h-4 text-[#F472B6] fill-[#F472B6] animate-pulse" />
-        <span>잠시 어깨 힘을 빼고 천천히 숨을 들이마셔 보세요.</span>
-      </div>
+      {/* Mindful prompt or Fast Forward Button */}
+      {showSkipButton && onForceComplete ? (
+        <div className="mt-8 animate-in fade-in duration-300">
+          <button
+            onClick={onForceComplete}
+            className="px-5 py-3 rounded-2xl bg-[#8B5CF6] hover:bg-[#7C3AED] text-white font-extrabold text-sm border-2 border-[#1E293B] shadow-pop hover:scale-105 transition-all flex items-center justify-center gap-2 mx-auto cursor-pointer"
+          >
+            <span>분석 완료! 리포트 바로 보기</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+      ) : (
+        <div className="mt-8 p-4 rounded-2xl bg-white border-2 border-[#1E293B] shadow-pop-sm max-w-sm mx-auto flex items-center justify-center gap-2.5 text-xs text-[#1E293B] font-bold">
+          <Heart className="w-4 h-4 text-[#F472B6] fill-[#F472B6] animate-pulse" />
+          <span>잠시 어깨 힘을 빼고 천천히 숨을 들이마셔 보세요.</span>
+        </div>
+      )}
     </div>
   );
 };

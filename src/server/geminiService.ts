@@ -210,39 +210,39 @@ export async function handleChatLogic(messages: any[], assessmentData: any) {
       }
     }
 
-    // Try gemini-2.5-flash first for ultra-fast, reliable and warm conversation, then gemini-3.7-flash
-    try {
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+    // Helper for fast non-blocking timeout under high concurrency
+    const callChatWithTimeout = async (modelName: string, timeoutMs = 6000) => {
+      const callPromise = ai.models.generateContent({
+        model: modelName,
         contents: rawContents,
         config: {
           systemInstruction: COACH_SYSTEM_PROMPT,
           temperature: 0.8,
         },
       });
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error(`Chat Timeout ${modelName}`)), timeoutMs)
+      );
+      return Promise.race([callPromise, timeoutPromise]);
+    };
 
+    // Try gemini-2.5-flash first for ultra-fast, reliable and warm conversation, then gemini-3.7-flash
+    try {
+      const response = await callChatWithTimeout('gemini-2.5-flash', 6000);
       if (response.text?.trim()) {
         return response.text.trim();
       }
     } catch (err: any) {
-      console.warn('gemini-2.5-flash chat error, trying gemini-3.7-flash fallback:', err?.message);
-    }
-
-    try {
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.7-flash',
-        contents: rawContents,
-        config: {
-          systemInstruction: COACH_SYSTEM_PROMPT,
-          temperature: 0.8,
-        },
-      });
-
-      if (response.text?.trim()) {
-        return response.text.trim();
+      console.warn('gemini-2.5-flash chat error/timeout, trying gemini-3.7-flash fallback:', err?.message);
+      try {
+        const response = await callChatWithTimeout('gemini-3.7-flash', 6000);
+        if (response.text?.trim()) {
+          return response.text.trim();
+        }
+      } catch (fallbackErr) {
+        console.warn('Gemini chat models congested during multi-user peak, using instant empathetic engine:', fallbackErr);
+        return getHeuristicChatReply(messages);
       }
-    } catch (fallbackErr) {
-      console.error('All Gemini chat models failed, using intelligent rule reply:', fallbackErr);
     }
 
     return getHeuristicChatReply(messages);
@@ -398,35 +398,55 @@ ${chatContext}
       temperature: 0.7,
     };
 
-    let response;
-    try {
-      response = await ai.models.generateContent({
-        model: 'gemini-3.7-flash',
+    let responseText = '';
+    
+    // Helper with timeout
+    const callModelWithTimeout = async (modelName: string, timeoutMs = 8000) => {
+      const callPromise = ai.models.generateContent({
+        model: modelName,
         contents: promptText,
         config: generateConfig,
       });
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error(`Timeout ${modelName}`)), timeoutMs)
+      );
+      return Promise.race([callPromise, timeoutPromise]);
+    };
+
+    try {
+      // Try gemini-2.5-flash first (fast & reliable JSON schema response)
+      const res = await callModelWithTimeout('gemini-2.5-flash', 8000);
+      responseText = res.text?.trim() || '';
     } catch (err: any) {
-      console.warn('gemini-3.7-flash analyze error, trying gemini-2.5-flash fallback:', err?.message);
+      console.warn('gemini-2.5-flash analyze error, trying gemini-3.7-flash:', err?.message);
       try {
-        response = await ai.models.generateContent({
-          model: 'gemini-2.5-flash',
-          contents: promptText,
-          config: generateConfig,
-        });
+        const res = await callModelWithTimeout('gemini-3.7-flash', 8000);
+        responseText = res.text?.trim() || '';
       } catch (fallbackErr) {
-        console.error('All Gemini analyze models failed, using heuristic engine:', fallbackErr);
+        console.error('All Gemini models timed out or failed in analyze, generating smart clinical report:', fallbackErr);
         return getFallbackReport(assessmentData);
       }
     }
 
-    const text = response.text?.trim() || '';
-    const parsedJson = JSON.parse(text);
+    try {
+      let cleaned = responseText;
+      if (cleaned.startsWith('```json')) {
+        cleaned = cleaned.replace(/^```json/, '').replace(/```$/, '').trim();
+      } else if (cleaned.startsWith('```')) {
+        cleaned = cleaned.replace(/^```/, '').replace(/```$/, '').trim();
+      }
 
-    if (!['안전', '주의', '위험'].includes(parsedJson.riskLevel)) {
-      parsedJson.riskLevel = assessmentData.scores?.pssTotal >= 11 ? '위험' : assessmentData.scores?.pssTotal >= 7 ? '주의' : '안전';
+      const parsedJson = JSON.parse(cleaned);
+
+      if (!['안전', '주의', '위험'].includes(parsedJson.riskLevel)) {
+        parsedJson.riskLevel = assessmentData.scores?.pssTotal >= 11 ? '위험' : assessmentData.scores?.pssTotal >= 7 ? '주의' : '안전';
+      }
+
+      return parsedJson;
+    } catch (parseError) {
+      console.error('JSON parsing failed on analyze response, returning clinical fallback report:', parseError);
+      return getFallbackReport(assessmentData);
     }
-
-    return parsedJson;
   } else {
     return getFallbackReport(assessmentData);
   }

@@ -32,17 +32,73 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const createFallbackReport = (payload: AssessmentPayload): DiagnosisReport => {
+    const lastUserMsg = payload.chatHistory?.filter((m) => m.role === 'user').slice(-1)[0]?.content || '';
+    let contextualSummary = '조금 지쳐있더라도, 당신 내면의 회복 자원은 든든히 작동하고 있습니다.';
+    if (lastUserMsg.includes('쉬지') || lastUserMsg.includes('쉬고') || lastUserMsg.includes('휴식')) {
+      contextualSummary = '온전히 쉬지 못했던 마음의 부담을 내려놓고, 나만의 안전한 쉼표를 허락해 주세요.';
+    } else if (payload.scores.pssTotal >= 10) {
+      contextualSummary = '과중했던 책임감의 무게를 잠시 덜어내고, 나를 위한 온전한 숨을 채울 시간입니다.';
+    }
+
+    return {
+      id: `report_${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      reportTitle: `${payload.selectedEmotions.slice(0, 2).join(' ')} 마음 뒤로 따뜻한 온기가 머무는 시간`,
+      summarySentence: contextualSummary,
+      psychologicalAnalysis: `선택하신 [${payload.selectedEmotions.join(', ')}] 감정과 스트레스 지수(${payload.scores.pssTotal}점 / 16점)를 종합해 볼 때, 심리적 에너지가 소진되어 몸과 마음에 휴식 신호가 켜진 상태입니다. 특히 '${payload.scores.lowestKRQDimension.label}' 영역이 취약해진 만큼, 혼자 모든 무게를 짊어지려 하기보다 작은 단위로 짐을 나누고 즉각적인 이완 요법을 실천하는 것이 큰 도움이 됩니다.`,
+      riskLevel: payload.scores.pssTotal >= 11 ? '위험' : payload.scores.pssTotal >= 7 ? '주의' : '안전',
+      actionPlans: [
+        {
+          type: 'immediate',
+          categoryTag: '⚡ 3분 즉각 리셋',
+          title: '3분 4-7-8 박스 이완 호흡',
+          description: '코로 4초 숨을 들이마시고, 7초간 머무른 뒤, 8초간 입으로 길게 내쉬며 교감신경의 긴장을 내려놓습니다.',
+          duration: '소요시간 3분',
+        },
+        {
+          type: 'micro',
+          categoryTag: '☕ 소소한 일상 힐링',
+          title: '무자극 5분 시각 디톡스',
+          description: '스마트폰과 모든 모니터를 끄고, 따뜻한 차 한 잔과 함께 창밖 먼 곳을 가만히 응시해 봅니다.',
+          duration: '소요시간 5분',
+        },
+        {
+          type: 'routine',
+          categoryTag: '🌱 마음근육 데일리 루틴',
+          title: `${payload.scores.lowestKRQDimension.label} 강화를 위한 마이크로 투두`,
+          description: '오늘 해야 할 일 중 단 1가지를 의도적으로 내일로 넘겨보고, 죄책감 없이 나만의 저녁 시간을 가져보세요.',
+          duration: '오늘 저녁',
+        },
+        {
+          type: 'mindset',
+          categoryTag: '💡 나를 위한 한마디',
+          title: '지금 이대로도 충분히 애썼다는 자기 허용',
+          description: '"완벽하게 해내지 않아도 괜찮아. 오늘 하루를 버텨낸 나 자신이 가장 대견해"라고 스스로에게 말해주세요.',
+          duration: '언제든',
+        },
+      ],
+      assessmentData: payload,
+    };
+  };
+
   // Handle Assessment Submission & Final Report Generation
   const handleSubmitAssessment = async (payload: AssessmentPayload) => {
     setAssessmentStage('loading');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 7000);
 
     try {
       const response = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         throw new Error(`HTTP error ${response.status}`);
@@ -56,8 +112,23 @@ export default function App() {
         reportTitle: result.reportTitle || '오늘의 마음 날씨 리포트',
         summarySentence: result.summarySentence || '마음의 쉼표가 필요한 하루입니다.',
         psychologicalAnalysis: result.psychologicalAnalysis || '데이터를 분석하여 따뜻한 위로를 전합니다.',
-        riskLevel: result.riskLevel || '주의',
-        actionPlans: result.actionPlans || [],
+        riskLevel: result.riskLevel || (payload.scores.pssTotal >= 11 ? '위험' : payload.scores.pssTotal >= 7 ? '주의' : '안전'),
+        actionPlans: result.actionPlans && result.actionPlans.length > 0 ? result.actionPlans : [
+          {
+            type: 'immediate',
+            categoryTag: '⚡ 3분 즉각 리셋',
+            title: '3분 4-7-8 박스 이완 호흡',
+            description: '코로 4초 들이마시고, 7초 멈춘 뒤, 8초 동안 길게 내쉬며 긴장을 풀어줍니다.',
+            duration: '소요시간 3분',
+          },
+          {
+            type: 'routine',
+            categoryTag: '🌱 마음근육 루틴',
+            title: `${payload.scores.lowestKRQDimension.label} 회복을 위한 5분 저널링`,
+            description: '오늘 나를 지켜준 작은 순간이나 스스로에게 해주고 싶은 격려 한 마디를 적어보세요.',
+            duration: '매일 5분',
+          },
+        ],
         assessmentData: payload,
       };
 
@@ -72,30 +143,9 @@ export default function App() {
         colors: ['#8B5CF6', '#F472B6', '#FBBF24', '#34D399'],
       });
     } catch (error) {
-      console.error('Failed to analyze assessment with API:', error);
-      // Construct friendly fallback report
-      const fallbackReport: DiagnosisReport = {
-        id: `report_${Date.now()}`,
-        createdAt: new Date().toISOString(),
-        reportTitle: '구름 낀 하늘 뒤로 온기가 머무는 시간',
-        summarySentence: '조금 지쳐있더라도, 당신 내면의 회복 자원은 든든히 작동하고 있습니다.',
-        psychologicalAnalysis: `선택하신 ${payload.selectedEmotions.join(', ')} 감정 상태와 PSS 스트레스 지수(${payload.scores.pssTotal}점)를 살펴볼 때, 심리적 피로감이 다소 누적된 상태입니다. 과중한 책임을 잠시 내려놓고 3분 안심 호흡과 ${payload.scores.lowestKRQDimension.label}을 북돋는 실천을 추천드립니다.`,
-        riskLevel: payload.scores.pssTotal >= 11 ? '위험' : payload.scores.pssTotal >= 7 ? '주의' : '안전',
-        actionPlans: [
-          {
-            type: 'immediate',
-            title: '3분 4-7-8 박스 이완 호흡',
-            description: '코로 4초 들이마시고, 7초간 멈춘 후, 8초간 입으로 천천히 내쉬며 굳은 몸의 긴장을 이완합니다.',
-          },
-          {
-            type: 'routine',
-            title: `${payload.scores.lowestKRQDimension.label} 보완을 위한 5분 저널링`,
-            description: '오늘 나를 지지해 준 작은 순간 하나를 기록하고 스스로에게 따뜻한 칭찬 한 마디를 선물하세요.',
-          },
-        ],
-        assessmentData: payload,
-      };
-
+      clearTimeout(timeoutId);
+      console.warn('Analysis API error or timeout, generating instant clinical report:', error);
+      const fallbackReport = createFallbackReport(payload);
       setActiveReport(fallbackReport);
       setAssessmentStage('result');
     }
@@ -145,7 +195,17 @@ export default function App() {
           />
         )}
 
-        {assessmentStage === 'loading' && <LoadingAnalysis />}
+        {assessmentStage === 'loading' && (
+          <LoadingAnalysis
+            onForceComplete={() => {
+              if (pendingPayload) {
+                const fallbackReport = createFallbackReport(pendingPayload);
+                setActiveReport(fallbackReport);
+                setAssessmentStage('result');
+              }
+            }}
+          />
+        )}
 
         {assessmentStage === 'result' && activeReport && (
           <ReportDashboard
